@@ -1,8 +1,9 @@
 import { StyleSheet, Text, View } from "react-native";
-import { Button } from "native-base";
 import React, { useCallback, useRef, useState } from "react";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { useMovies } from "../../services";
+
+import { Button } from "tamagui";
 export default function TabOneScreen() {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [bottomSheetIndex, setBottomSheetIndex] = useState(-1);
@@ -13,7 +14,9 @@ export default function TabOneScreen() {
   const { movies, page, goNextPage, goPrevPage, changeMovieType } = useMovies({
     defaultMovieType: "now_playing",
   });
-  return <View style={styles.container}></View>;
+  return <View style={styles.container}>
+    <Button>Hello World</Button>
+  </View>;
 }
 
 const styles = StyleSheet.create({

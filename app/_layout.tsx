@@ -4,6 +4,8 @@ import {
   DefaultTheme,
   ThemeProvider,
 } from "@react-navigation/native";
+import { TamaguiProvider } from 'tamagui'
+import config from '../tamagui.config'
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack } from "expo-router";
 import { useEffect } from "react";
@@ -14,10 +16,10 @@ export {
   ErrorBoundary,
 } from "expo-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { NativeBaseProvider } from "native-base";
+import React from "react";
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: "(tabs)",
+  initialRouteName: "Onboarding",
 };
 
 export default function RootLayout() {
@@ -46,17 +48,17 @@ function RootLayoutNav() {
   return (
     <>
       <QueryClientProvider client={queryClient}>
-        <NativeBaseProvider>
+        <TamaguiProvider config={config}>
           <ThemeProvider value={DefaultTheme}>
-            <Stack>
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack initialRouteName="Onboarding">
               <Stack.Screen
-                name="modal"
-                options={{ presentation: "fullScreenModal" }}
+                name="Onboarding"
+                options={{ headerShown: false }}
               />
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             </Stack>
           </ThemeProvider>
-        </NativeBaseProvider>
+        </TamaguiProvider>
         <Toast />
       </QueryClientProvider>
     </>
