@@ -1,9 +1,8 @@
-import { StyleSheet, Text, View } from "react-native";
-import React, { useCallback, useRef, useState } from "react";
-import BottomSheet from "@gorhom/bottom-sheet";
-import { useMovies } from "../../services";
-
-import { Button } from "tamagui";
+import { StyleSheet, Text, View } from 'react-native';
+import React, { useCallback, useRef, useState } from 'react';
+import BottomSheet from '@gorhom/bottom-sheet';
+import { Button } from 'tamagui';
+import ProtectedScreen from '../../components/shared/ProtectedScreen';
 export default function TabOneScreen() {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [bottomSheetIndex, setBottomSheetIndex] = useState(-1);
@@ -11,22 +10,25 @@ export default function TabOneScreen() {
     setBottomSheetIndex(index);
   }, []);
 
-  const { movies, page, goNextPage, goPrevPage, changeMovieType } = useMovies({
-    defaultMovieType: "now_playing",
-  });
-  return <View style={styles.container}>
-    <Button>Hello World</Button>
-  </View>;
+  return (
+    <ProtectedScreen>
+      <View style={styles.container}>
+        <Button>
+          <Text>Hello World</Text>
+        </Button>
+      </View>
+    </ProtectedScreen>
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   title: {
     fontSize: 20,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
 });

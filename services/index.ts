@@ -1,3 +1,3 @@
-import useMovies from "./use-movies";
+import useAuth from './auth';
 
-export { useMovies };
+export { useAuth };

@@ -1,11 +1,13 @@
-import React, { PropsWithChildren } from 'react'
-import { router } from 'expo-router'
-import useAuth from '../../services/useAuth'
-import LoadingScreen from './LoadingScreen'
+import React, { PropsWithChildren, useEffect } from 'react';
+import { router } from 'expo-router';
+import useAuth from '../../services/auth';
+import LoadingScreen from './LoadingScreen';
 export default function ProtectedScreen({ children }: PropsWithChildren) {
-    const { user, isLoading } = useAuth()
-    if (isLoading) return <LoadingScreen />
+  const { user, isLoading } = useAuth();
 
-    else if (!user) router.replace('/Onboarding')
-    return <>{children}</>
+  useEffect(() => {
+    if (isLoading) return <LoadingScreen />;
+    else if (!user) router.replace('/Onboarding');
+  }, [isLoading, user]);
+  return <>{children}</>;
 }
