@@ -1,13 +1,12 @@
-import { View, Modal } from 'react-native'
-import { EnsureFlexed, Dialog } from 'tamagui'
+import { Text, Dialog, Stack, ZStack, Spinner, Theme } from 'tamagui';
 //import Lottie from 'lottie-react-native'
-import React from 'react'
+import React from 'react';
 export default function LoadingScreen() {
-    return (
-        <Dialog open defaultOpen>
-            <View w='full' background='primary.900' alignItems='center' justifyContent='center' flex={1}>
-                <Text>Loading...</Text>
-            </View>
-        </Dialog>
-    )
+  return (
+    <ZStack animation={'100ms'} fullscreen backgroundColor={'rgba(0,0,0,0.3)'}>
+      <Stack alignItems="center" justifyContent="center" flex={1}>
+        <Spinner size="large" color="black" />
+      </Stack>
+    </ZStack>
+  );
 }

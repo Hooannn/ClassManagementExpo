@@ -1,11 +1,18 @@
 import { create } from 'zustand';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { persist } from 'zustand/middleware';
+export interface Credentials {
+  access_token: string;
+  refresh_token: string;
+}
 
-enum Role {
+export enum Role {
   Admin = 'admin',
   User = 'user',
 }
 
-interface User {
+export interface User {
+  id: number;
   email: string;
   first_name: string;
   last_name: string;
@@ -23,13 +30,21 @@ interface ProfileStore {
   setUser: (user: User) => void;
 }
 
-const useProfileStore = create<ProfileStore>()((set) => ({
-  accessToken: undefined,
-  refreshToken: undefined,
-  user: undefined,
-  setAccessToken: (token) => set((state) => ({ accessToken: token })),
-  setRefreshToken: (token) => set((state) => ({ refreshToken: token })),
-  setUser: (user) => set((state) => ({ user })),
-}));
+const useProfileStore = create<ProfileStore>()(
+  persist(
+    (set) => ({
+      accessToken: undefined,
+      refreshToken: undefined,
+      user: undefined,
+      setAccessToken: (token) => set((state) => ({ accessToken: token })),
+      setRefreshToken: (token) => set((state) => ({ refreshToken: token })),
+      setUser: (user) => set((state) => ({ user })),
+    }),
+    {
+      name: 'profile-storage',
+      getStorage: () => AsyncStorage,
+    },
+  ),
+);
 
 export default useProfileStore;

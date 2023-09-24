@@ -36,7 +36,7 @@ export default function SignInScreen() {
             isLoading={checkUserMutation.isLoading}
             onPress={onSubmit}
           >
-            Get code
+            Continue
           </PrimaryButton>
           <Text textAlign="center" fontSize={'$3'} px="$8">
             By continueing, you certify that you have read and agree to the

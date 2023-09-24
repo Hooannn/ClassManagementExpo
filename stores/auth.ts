@@ -1,6 +1,7 @@
 import { create } from 'zustand';
-
-type AuthenState = 'signIn' | 'signUp';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { persist } from 'zustand/middleware';
+export type AuthenState = 'signIn' | 'signUp';
 interface AuthStore {
   isLoggedIn: boolean;
   shouldShowOnboarding: boolean;
@@ -12,16 +13,24 @@ interface AuthStore {
   setAuthenState: (state: AuthenState) => void;
 }
 
-const useAuthStore = create<AuthStore>()((set) => ({
-  isLoggedIn: false,
-  shouldShowOnboarding: true,
-  emailInput: undefined,
-  authenState: undefined,
-  setEmailInput: (email) => set((state) => ({ emailInput: email })),
-  setLoggedIn: (isLoggedIn) => set((state) => ({ isLoggedIn })),
-  setShowOnboarding: (shouldShow) =>
-    set((state) => ({ shouldShowOnboarding: shouldShow })),
-  setAuthenState: (authenState) => set((state) => ({ authenState })),
-}));
+const useAuthStore = create<AuthStore>()(
+  persist(
+    (set) => ({
+      isLoggedIn: false,
+      shouldShowOnboarding: true,
+      emailInput: undefined,
+      authenState: undefined,
+      setEmailInput: (email) => set((state) => ({ emailInput: email })),
+      setLoggedIn: (isLoggedIn) => set((state) => ({ isLoggedIn })),
+      setShowOnboarding: (shouldShow) =>
+        set((state) => ({ shouldShowOnboarding: shouldShow })),
+      setAuthenState: (authenState) => set((state) => ({ authenState })),
+    }),
+    {
+      name: 'auth-storage',
+      getStorage: () => AsyncStorage,
+    },
+  ),
+);
 
 export default useAuthStore;

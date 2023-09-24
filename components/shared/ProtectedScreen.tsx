@@ -1,13 +1,14 @@
 import React, { PropsWithChildren, useEffect } from 'react';
-import { router } from 'expo-router';
-import useAuth from '../../services/auth';
-import LoadingScreen from './LoadingScreen';
+import { router, useRootNavigationState } from 'expo-router';
+import useAuthStore from '../../stores/auth';
 export default function ProtectedScreen({ children }: PropsWithChildren) {
-  const { user, isLoading } = useAuth();
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+  const navigationState = useRootNavigationState();
 
   useEffect(() => {
-    if (isLoading) return <LoadingScreen />;
-    else if (!user) router.replace('/Onboarding');
-  }, [isLoading, user]);
+    if (!navigationState?.key) return;
+
+    if (!isLoggedIn) router.replace('/Onboarding');
+  }, [isLoggedIn, navigationState]);
   return <>{children}</>;
 }
