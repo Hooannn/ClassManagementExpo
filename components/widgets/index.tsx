@@ -1,8 +1,13 @@
+import { GestureResponderEvent } from 'react-native';
 import { Button, Theme, Spinner } from 'tamagui';
 interface Props {
   isLoading: boolean;
+  onPress: (event: GestureResponderEvent) => void;
+  children: JSX.Element | string;
+  icon?: JSX.Element;
+  w?: string;
 }
-export function PrimaryButton(props: typeof Button.propTypes & Props) {
+export function PrimaryButton(props: Props) {
   return (
     <Button
       {...props}
@@ -18,7 +23,7 @@ export function PrimaryButton(props: typeof Button.propTypes & Props) {
   );
 }
 
-export function SecondaryButton(props: typeof Button.propTypes & Props) {
+export function SecondaryButton(props: Props) {
   return (
     <Theme name="dark">
       <Button
@@ -35,7 +40,7 @@ export function SecondaryButton(props: typeof Button.propTypes & Props) {
   );
 }
 
-export function TextButton(props: typeof Button.propTypes & Props) {
+export function TextButton(props: Props) {
   return (
     <Button
       {...props}

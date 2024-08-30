@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "money-master",
-    "slug": "money-master",
+    "name": "class-management-expo",
+    "slug": "class-management-expo",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -28,7 +28,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "b3b48667-a726-47cd-9d57-54c0df6bfac8"
+        "projectId": "4ee91048-76e2-438a-ba9d-4acefb6bf4eb"
       }
     },
     "owner": "hoanthui123"

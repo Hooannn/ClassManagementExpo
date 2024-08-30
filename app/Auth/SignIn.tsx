@@ -1,62 +1,79 @@
 import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Input, YStack, XStack, Theme, Button, H2, Text, H3 } from 'tamagui';
-import {
-  PrimaryButton,
-  SecondaryButton,
-  TextButton,
-} from '../../components/widgets';
-import { AntDesign } from '@expo/vector-icons';
+import { Input, YStack, Text, H3, Stack, Image } from 'tamagui';
+import { PrimaryButton } from '../../components/widgets';
 import { useAuth } from '../../services';
-import useAuthStore from '../../stores/auth';
+import { router } from 'expo-router';
+import { useAssets } from 'expo-asset';
+import { useToastController } from '@tamagui/toast';
 export default function SignInScreen() {
-  const emailInput = useAuthStore((state) => state.emailInput);
-  const updateEmailInput = useAuthStore((state) => state.setEmailInput);
+  const [assets] = useAssets([require('../../assets/images/Login.png')]);
+  const { signInMutation } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const toast = useToastController();
 
-  const { checkUserMutation } = useAuth();
   const onSubmit = async () => {
-    await checkUserMutation.mutateAsync();
+    if (email.trim() === '' || password.trim() === '') {
+      toast?.show('Hãy nhập đủ thông tin đăng nhập', {
+        native: false,
+        customData: {
+          theme: 'yellow',
+        },
+      });
+      return;
+    }
+    await signInMutation.mutateAsync({ email, password });
   };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
-      <YStack px="$5" py="$8" flex={1} ai={'center'} jc={'space-between'}>
-        <YStack w={'100%'} space="$2">
-          <H3 textAlign="center" py="$8">
-            Enter your email
+      <YStack px="$5" py="$8" flex={1}>
+        <YStack w={'100%'} gap="$3">
+          <Image
+            source={{
+              uri: assets?.[0].uri,
+            }}
+            h={180}
+            w={180}
+            marginHorizontal="auto"
+            objectFit="contain"
+          />
+
+          <H3 textAlign="center" py="$4">
+            Nhập thông tin đăng nhập
           </H3>
           <Input
             placeholder={`johndoe@example.com`}
             size="$5"
-            value={emailInput}
-            onChange={(e) => updateEmailInput(e.nativeEvent.text)}
+            value={email}
+            onChange={(e) => setEmail(e.nativeEvent.text)}
+            borderRadius={'$12'}
+          />
+          <Input
+            placeholder={`******`}
+            size="$5"
+            value={password}
+            secureTextEntry={true}
+            onChange={(e) => setPassword(e.nativeEvent.text)}
             borderRadius={'$12'}
           />
           <PrimaryButton
-            isLoading={checkUserMutation.isLoading}
+            isLoading={signInMutation.isLoading}
             onPress={onSubmit}
           >
-            Continue
+            Đăng nhập
           </PrimaryButton>
           <Text textAlign="center" fontSize={'$3'} px="$8">
-            By continueing, you certify that you have read and agree to the
-            Privary Policy
+            <Text
+              color={'$primary'}
+              onPress={() => {
+                router.push('/Auth/ForgotPassword');
+              }}
+            >
+              Quên mật khẩu?
+            </Text>
           </Text>
-        </YStack>
-
-        <YStack w={'100%'} space="$3">
-          <TextButton
-            isLoading={checkUserMutation.isLoading}
-            icon={<AntDesign name="google" size={20} color="black" />}
-          >
-            Continue with Google
-          </TextButton>
-          <SecondaryButton
-            isLoading={checkUserMutation.isLoading}
-            icon={<AntDesign name="apple1" size={20} color="white" />}
-          >
-            Continue with Apple
-          </SecondaryButton>
         </YStack>
       </YStack>
     </SafeAreaView>

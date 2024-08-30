@@ -1,8 +1,9 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { GestureResponderEvent } from 'react-native';
 import { Text, Image, H2, YStack, XStack, Button, Stack } from 'tamagui';
 import PagerView from 'react-native-pager-view';
 import { router } from 'expo-router';
+import useAuthStore from '../stores/auth';
 import {
   useSafeAreaInsets,
   SafeAreaView,
@@ -16,26 +17,27 @@ export default function OnboardingScreen() {
     require('../assets/images/Onboarding_3.png'),
   ]);
   const pagerRef = useRef<PagerView>(null);
+  const { setShowOnboarding, shouldShowOnboarding } = useAuthStore();
   const ONBOARDING_PAGES = [
     {
       displayImage: assets?.[0],
-      title: 'Welcome to MoneyMaster.',
+      title: 'Quản lý lớp học cho giảng viên PTITHCM.',
       description:
-        'Take control of your finances with MoneyMaster, the sleek money manager app. Start today!',
+        'Ứng dụng giúp giảng viên PTITHCM quản lý lớp học dễ dàng và hiệu quả.',
       isFinal: false,
     },
     {
       displayImage: assets?.[1],
-      title: 'Track Your Spending.',
+      title: 'Tích hợp điểm danh bằng khuôn mặt.',
       description:
-        'Easily track expenses and gain financial insights with MoneyMaster.',
+        'Tự động hóa quá trình điểm danh với công nghệ nhận diện khuôn mặt.',
       isFinal: false,
     },
     {
       displayImage: assets?.[2],
-      title: 'Set Realistic Budgets.',
+      title: 'Quản lý điểm số cho sinh viên.',
       description:
-        'Create personalized budgets for financial freedom with MoneyMaster.',
+        'Hỗ trợ giảng viên quản lý điểm danh và chấm điểm sinh viên chính xác, nhanh chóng.',
       isFinal: true,
     },
   ];
@@ -55,14 +57,23 @@ export default function OnboardingScreen() {
   };
 
   const onGetStartedPressed = async () => {
+    setShowOnboarding(false);
     router.replace('/Auth/SignIn');
   };
+
+  useEffect(() => {
+    if (!shouldShowOnboarding) {
+      setTimeout(() => {
+        router.replace('/Auth/SignIn');
+      }, 1);
+    }
+  }, []);
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
       <XStack space="$2" alignItems="center" jc={'center'} mt="$5">
         {ONBOARDING_PAGES.map((_, idx) => (
           <Stack
-            key={idx}
+            key={'ABC' + idx}
             h={'$0.25'}
             w={44}
             backgroundColor={page == idx ? '$green10' : '$gray8'}
@@ -94,7 +105,7 @@ interface OnboardingPageProps {
   title?: string;
   description?: string;
   displayImage?: Asset;
-  key: number;
+  key: number | string;
   isFinal: boolean;
   onSkipPressed?: ((event: GestureResponderEvent) => void) | null | undefined;
   onNextPressed?: ((event: GestureResponderEvent) => void) | null | undefined;
@@ -136,24 +147,27 @@ function OnboardingPage(props: OnboardingPageProps) {
         <XStack space="$2" w="100%" ai={'center'} jc={'space-between'}>
           {props.isFinal ? (
             <PrimaryButton
+              isLoading={false}
               onPress={(event: any) => props.onGetStartedPressed?.(event)}
               w="50%"
             >
-              Get started
+              Bắt đầu
             </PrimaryButton>
           ) : (
             <PrimaryButton
+              isLoading={false}
               onPress={(event: any) => props.onNextPressed?.(event)}
               w="50%"
             >
-              Continue
+              Tiếp theo
             </PrimaryButton>
           )}
           <TextButton
+            isLoading={false}
             onPress={(event: any) => props.onGetStartedPressed?.(event)}
             w="50%"
           >
-            Skip
+            Bỏ qua
           </TextButton>
         </XStack>
       </YStack>

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import axios from 'axios';
 export const axiosIns = axios.create({
-  baseURL: 'https://moneymaster.onrender.com',
+  baseURL: 'http://localhost:5000',
   headers: {
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': '*',
