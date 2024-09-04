@@ -14,27 +14,11 @@ function TabBarIcon(props: {
 
 export default function TabLayout() {
   return (
-    <Tabs
-      screenOptions={{ headerShown: false }}
-      tabBar={(bottomBar) => (
-        <XStack
-          p="$2"
-          backgroundColor={'red'}
-          ai={'center'}
-          jc={'space-around'}
-        >
-          {bottomBar.state.routes.map((route) => (
-            <Link href={`/${route.name}`}>
-              <Button>{route.name}</Button>
-            </Link>
-          ))}
-        </XStack>
-      )}
-    >
+    <Tabs screenOptions={{ headerShown: false }}>
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
+          title: 'Trang chủ',
           tabBarIcon: ({ color }) => <TabBarIcon name="plane" color={color} />,
         }}
       />
@@ -55,7 +39,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="Wallets"
         options={{
-          title: 'Wallets',
+          title: 'Cài đặt',
           tabBarIcon: ({ color }) => <TabBarIcon name="tags" color={color} />,
         }}
       />

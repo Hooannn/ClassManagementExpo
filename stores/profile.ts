@@ -6,19 +6,16 @@ export interface Credentials {
   refresh_token: string;
 }
 
-export enum Role {
-  Admin = 'admin',
-  User = 'user',
-}
-
 export interface User {
   id: number;
   email: string;
   first_name: string;
   last_name: string;
-  roles: Role[];
-  avatar?: string;
-  password?: string;
+  is_male: boolean;
+  is_admin: boolean;
+  profile_picture?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 interface ProfileStore {

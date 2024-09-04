@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
 import axios from 'axios';
+import { CONSTANTS } from '../constants';
 export const axiosIns = axios.create({
-  baseURL: 'http://localhost:5000',
+  baseURL: CONSTANTS.BACKEND_URL,
   headers: {
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': '*',

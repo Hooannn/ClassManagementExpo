@@ -21,7 +21,6 @@ export {
   ErrorBoundary,
 } from 'expo-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import React from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
