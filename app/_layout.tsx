@@ -7,7 +7,7 @@ import {
 import { TamaguiProvider, YStack } from 'tamagui';
 import config from '../tamagui.config';
 import { useFonts } from 'expo-font';
-import { SplashScreen, Stack } from 'expo-router';
+import { Stack } from 'expo-router';
 import { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
 import {
@@ -37,13 +37,14 @@ export default function RootLayout() {
 
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
-    if (error) throw error;
+    if (error) {
+      console.log(error);
+      throw error;
+    }
   }, [error]);
 
   return (
     <>
-      {/* Keep the splash screen open until the assets have loaded. In the future, we should just support async font loading with a native version of font-display. */}
-      {!loaded && <SplashScreen />}
       {loaded && <RootLayoutNav />}
     </>
   );

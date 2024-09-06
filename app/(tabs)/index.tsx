@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { YStack, XStack, Avatar, H3 } from 'tamagui';
 import ProtectedScreen from '../../components/shared/ProtectedScreen';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -18,17 +17,18 @@ export default function HomeScreen() {
         <YStack px="$5">
           <XStack ai={'center'} jc="space-between" py="$3">
             <XStack ai={'center'} space="$2">
+              {/* Place button icon here */}
+            </XStack>
+            <XStack ai={'center'} space="$2">
               <Avatar circular size="$5">
-                <Avatar.Image accessibilityLabel="Cam" />
+                <Avatar.Image accessibilityLabel="Cam"
+                  src={user?.profile_picture ? `${CONSTANTS.BACKEND_URL}${user.profile_picture}` : ''}
+                />
                 <Avatar.Fallback
-                  backgroundColor={'$blue11'}
-                  ac={'center'}
-                  jc={'center'}
+                  backgroundColor={'$gray10Light'}
                 >
-                  <FontAwesome name="user" size={24} color="black" />
                 </Avatar.Fallback>
               </Avatar>
-              <H3>{name}</H3>
             </XStack>
           </XStack>
         </YStack>
