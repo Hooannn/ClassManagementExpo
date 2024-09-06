@@ -24,30 +24,11 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: 'Onboarding',
+  initialRouteName: '(tabs)',
 };
 
 export default function RootLayout() {
-  const [loaded, error] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-    Inter: require('../assets/fonts/Inter-Regular.ttf'),
-    InterBold: require('../assets/fonts/Inter-Bold.ttf'),
-    ...FontAwesome.font,
-  });
-
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
-  useEffect(() => {
-    if (error) {
-      console.log(error);
-      throw error;
-    }
-  }, [error]);
-
-  return (
-    <>
-      {loaded && <RootLayoutNav />}
-    </>
-  );
+  return <RootLayoutNav />;
 }
 const queryClient = new QueryClient();
 function RootLayoutNav() {

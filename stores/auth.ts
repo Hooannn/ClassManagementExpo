@@ -1,21 +1,32 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { persist } from 'zustand/middleware';
-interface AuthStore {
+type AuthStoreState = {
   isLoggedIn: boolean;
   shouldShowOnboarding: boolean;
+};
+
+type AuthStoreActions = {
   setLoggedIn: (isLoggedIn: boolean) => void;
   setShowOnboarding: (shouldShow: boolean) => void;
-}
+  reset: () => void;
+};
 
-const useAuthStore = create<AuthStore>()(
+const initialState: AuthStoreState = {
+  isLoggedIn: false,
+  shouldShowOnboarding: true,
+};
+
+const useAuthStore = create<AuthStoreState & AuthStoreActions>()(
   persist(
     (set) => ({
-      isLoggedIn: false,
-      shouldShowOnboarding: true,
+      ...initialState,
       setLoggedIn: (isLoggedIn) => set((state) => ({ isLoggedIn })),
       setShowOnboarding: (shouldShow) =>
         set((state) => ({ shouldShowOnboarding: shouldShow })),
+      reset: () => {
+        set(initialState);
+      },
     }),
     {
       name: 'auth-storage',

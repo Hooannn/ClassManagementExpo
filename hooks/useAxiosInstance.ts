@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import axios from 'axios';
 import { CONSTANTS } from '../constants';
+import useProfileStore from '../stores/profile';
 export const axiosIns = axios.create({
   baseURL: CONSTANTS.BACKEND_URL,
   headers: {
@@ -10,15 +11,15 @@ export const axiosIns = axios.create({
 });
 
 const useAxiosIns = () => {
-  const getAccessToken = async () =>
-    new Promise((resolve, reject) => resolve('ACCESS_TOKEN'));
+  const accessToken = useProfileStore((state) => state.accessToken);
+  const getAccessToken = () => accessToken;
 
   useEffect(() => {
     const requestIntercept = axiosIns.interceptors.request.use(
       async (config) => {
-        if (!config.headers?.authorization) {
-          const token = await getAccessToken();
-          if (config.headers) config.headers.authorization = `Bearer ${token}`;
+        if (!config.headers['Authorization']) {
+          const token = getAccessToken();
+          config.headers['Authorization'] = `Bearer ${token}`;
         }
         return config;
       },
@@ -30,6 +31,13 @@ const useAxiosIns = () => {
     const responseIntercept = axiosIns.interceptors.response.use(
       (response) => response,
       async (error) => {
+        if (
+          error?.response?.status === 401 &&
+          error?.response?.data?.msg === 'Token has expired'
+        ) {
+          alert('Token has expired');
+        }
+
         return Promise.reject(error);
       },
     );

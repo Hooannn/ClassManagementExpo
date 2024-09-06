@@ -17,7 +17,10 @@ export default function OnboardingScreen() {
     require('../assets/images/Onboarding_3.png'),
   ]);
   const pagerRef = useRef<PagerView>(null);
-  const { setShowOnboarding, shouldShowOnboarding } = useAuthStore();
+  const shouldShowOnboarding = useAuthStore(
+    (state) => state.shouldShowOnboarding,
+  );
+  const setShowOnboarding = useAuthStore((state) => state.setShowOnboarding);
   const ONBOARDING_PAGES = [
     {
       displayImage: assets?.[0],
@@ -132,7 +135,7 @@ function OnboardingPage(props: OnboardingPageProps) {
           }}
           width="100%"
           height="100%"
-          resizeMode="contain"
+          objectFit="contain"
         />
       </Stack>
 

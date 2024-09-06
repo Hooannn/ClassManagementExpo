@@ -18,24 +18,35 @@ export interface User {
   updated_at?: string;
 }
 
-interface ProfileStore {
+type ProfileStoreState = {
   accessToken?: string;
   refreshToken?: string;
   user?: User;
+};
+
+type ProfileStoreActions = {
   setAccessToken: (token: string) => void;
   setRefreshToken: (token: string) => void;
   setUser: (user: User) => void;
-}
+  reset: () => void;
+};
 
-const useProfileStore = create<ProfileStore>()(
+const initialState: ProfileStoreState = {
+  accessToken: undefined,
+  refreshToken: undefined,
+  user: undefined,
+};
+
+const useProfileStore = create<ProfileStoreState & ProfileStoreActions>()(
   persist(
     (set) => ({
-      accessToken: undefined,
-      refreshToken: undefined,
-      user: undefined,
+      ...initialState,
       setAccessToken: (token) => set((state) => ({ accessToken: token })),
       setRefreshToken: (token) => set((state) => ({ refreshToken: token })),
       setUser: (user) => set((state) => ({ user })),
+      reset: () => {
+        set(initialState);
+      },
     }),
     {
       name: 'profile-storage',
