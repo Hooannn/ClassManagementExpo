@@ -23,7 +23,7 @@ export default function TabTwoScreen() {
           onPress: () => {
             resetAuthStore();
             resetProfileStore();
-            router.replace('Onboarding');
+            router.replace('/Auth/SignIn');
           },
           style: 'destructive',
         },

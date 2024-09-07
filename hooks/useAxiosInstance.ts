@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import axios from 'axios';
 import { CONSTANTS } from '../constants';
 import useProfileStore from '../stores/profile';
+import useRefreshToken from './useRefreshToken';
 export const axiosIns = axios.create({
   baseURL: CONSTANTS.BACKEND_URL,
   headers: {
@@ -12,6 +13,7 @@ export const axiosIns = axios.create({
 
 const useAxiosIns = () => {
   const accessToken = useProfileStore((state) => state.accessToken);
+  const refreshToken = useRefreshToken();
   const getAccessToken = () => accessToken;
 
   useEffect(() => {
@@ -31,11 +33,19 @@ const useAxiosIns = () => {
     const responseIntercept = axiosIns.interceptors.response.use(
       (response) => response,
       async (error) => {
+        const prevRequest = error?.config;
         if (
           error?.response?.status === 401 &&
           error?.response?.data?.msg === 'Token has expired'
         ) {
-          alert('Token has expired');
+          prevRequest.sent = true;
+          const token = await refreshToken();
+          if (!token) throw new Error('Token đã hết hạn');
+          prevRequest.headers.Authorization = `Bearer ${token}`;
+          return axiosIns({
+            ...prevRequest,
+            headers: prevRequest.headers.toJSON(),
+          });
         }
 
         return Promise.reject(error);

@@ -79,7 +79,7 @@ export default function OnboardingScreen() {
             key={'ABC' + idx}
             h={'$0.25'}
             w={44}
-            backgroundColor={page == idx ? '$green10' : '$gray8'}
+            backgroundColor={page == idx ? '$yellow10' : '$gray8'}
           ></Stack>
         ))}
       </XStack>

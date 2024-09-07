@@ -1,7 +1,5 @@
 export * from './response.interface';
 
-export interface Course {}
-
 export interface User {
   id: number;
   email: string;
@@ -55,6 +53,13 @@ export interface Course {
   user_id: number;
   subject: Subject;
   enrollments: Enrollment[];
+}
+
+export interface CourseDetail extends Course {
+  course_notes: CourseNote[];
+  class_sessions: ClassSession[];
+  grades: Grade[];
+  user: User;
 }
 
 export enum EnrollmentStatus {

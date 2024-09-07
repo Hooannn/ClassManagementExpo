@@ -11,7 +11,7 @@ export function PrimaryButton(props: Props) {
   return (
     <Button
       {...props}
-      theme="green_alt2"
+      theme="yellow_alt2"
       fontWeight={'bold'}
       size={'$5'}
       disabled={props.isLoading}
@@ -45,7 +45,6 @@ export function TextButton(props: Props) {
     <Button
       {...props}
       icon={props.isLoading ? () => <Spinner /> : props.icon ?? undefined}
-      fontWeight={'bold'}
       size={'$5'}
       disabled={props.isLoading}
       borderRadius="$12"
