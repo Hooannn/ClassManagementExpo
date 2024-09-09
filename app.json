@@ -12,17 +12,27 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.classmanagement.app",
+      "buildNumber": "1.0.0",
+      "userInterfaceStyle": "light",
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app uses the camera to scan QR codes",
+        "NSPhotoLibraryUsageDescription": "This app uses the photo library to scan QR codes",
+        "NSMicrophoneUsageDescription": "This app uses the microphone to record audio",
+        "UIBackgroundModes": ["audio"]
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       }
+    },
+    "androidStatusBar": {
+      "barStyle": "light-content"
     },
     "web": {
       "bundler": "metro",
@@ -34,8 +44,6 @@
       }
     },
     "owner": "hoanthui123",
-    "plugins": [
-      "expo-font"
-    ]
+    "plugins": ["expo-font"]
   }
 }

@@ -40,7 +40,9 @@ const useAxiosIns = () => {
         ) {
           prevRequest.sent = true;
           const token = await refreshToken();
-          if (!token) throw new Error('Token đã hết hạn');
+          if (!token) {
+            return Promise.reject(error);
+          }
           prevRequest.headers.Authorization = `Bearer ${token}`;
           return axiosIns({
             ...prevRequest,

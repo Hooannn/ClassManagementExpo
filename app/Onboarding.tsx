@@ -1,6 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { GestureResponderEvent } from 'react-native';
-import { Text, Image, H2, YStack, XStack, Button, Stack } from 'tamagui';
+import { Text, Image, H2, YStack, XStack, Stack } from 'tamagui';
 import PagerView from 'react-native-pager-view';
 import { router } from 'expo-router';
 import useAuthStore from '../stores/auth';

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import {
   YStack,
   XStack,
@@ -11,7 +11,7 @@ import {
   YGroup,
   Separator,
 } from 'tamagui';
-import dayjs from 'dayjs';
+import dayjs from '../../libs/dayjs';
 import ProtectedScreen from '../../components/shared/ProtectedScreen';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import useProfileStore from '../../stores/profile';
