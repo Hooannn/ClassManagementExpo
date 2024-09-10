@@ -24,26 +24,16 @@ import { capitalize } from '../../../utils/stringFormat';
 import { CONSTANTS } from '../../../constants';
 
 export default function Students() {
-  const { id } = useLocalSearchParams();
+  const { id, enrollments: jsonEnrollments } = useLocalSearchParams();
   const [assets] = useAssets([
     require('../../../assets/images/Empty_courses.png'),
   ]);
-  const axios = useAxiosIns();
-  const getCourseEnrollmentsQuery = useQuery({
-    queryKey: ['fetch/courseDetail/enrollments', id],
-    refetchOnWindowFocus: false,
-    queryFn: () => {
-      return axios.get<Response<Enrollment[]>>(
-        `/api/v1/courses/${id}/enrollments`,
-      );
-    },
-  });
 
-  const enrollments = getCourseEnrollmentsQuery.data?.data?.data || [];
+  const enrollments: Enrollment[] = JSON.parse(jsonEnrollments.toString());
 
   return (
     <ProtectedScreen>
-      {getCourseEnrollmentsQuery.isLoading ? (
+      {false ? (
         <SafeAreaView style={{ flex: 1 }}>
           <Stack flex={1} ac="center" jc={'center'}>
             <Spinner size="large" />
@@ -87,11 +77,12 @@ export default function Students() {
                               <Avatar radiused size={'$6'}>
                                 <Avatar.Image
                                   objectFit="contain"
-                                  src={
-                                    enrollment.student?.profile_picture
+                                  source={{
+                                    uri: enrollment.student?.profile_picture
                                       ? `${CONSTANTS.BACKEND_URL}${enrollment.student.profile_picture}`
-                                      : ''
-                                  }
+                                      : '',
+                                    cache: 'force-cache',
+                                  }}
                                 />
                                 <Avatar.Fallback backgroundColor={'$gray10'} />
                               </Avatar>

@@ -143,7 +143,11 @@ export default function CourseDetailScreen() {
                       radiused
                       icon={<User size={20} />}
                       onPress={() => {
-                        router.push(`/Course/${id}/Students`);
+                        router.push(
+                          `/Course/${id}/Students?enrollments=${JSON.stringify(
+                            course?.enrollments,
+                          )}`,
+                        );
                       }}
                     >
                       <Text>Sinh viên</Text>
@@ -195,13 +199,14 @@ export default function CourseDetailScreen() {
                       borderWidth={'$1'}
                     >
                       <Avatar.Image
-                        src={
-                          course!.user?.profile_picture
+                        source={{
+                          uri: course!.user?.profile_picture
                             ? `${CONSTANTS.BACKEND_URL}${
                                 course!.user.profile_picture
                               }`
-                            : ''
-                        }
+                            : '',
+                          cache: 'force-cache',
+                        }}
                       />
                       <Avatar.Fallback backgroundColor={'$gray10'} />
                     </Avatar>
@@ -227,7 +232,15 @@ export default function CourseDetailScreen() {
                             >
                               <YGroup.Item>
                                 <ListItem
-                                  onPress={() => {}}
+                                  onPress={() => {
+                                    router.push(
+                                      `/Course/${id}/ClassSession/${
+                                        session.id
+                                      }?course=${JSON.stringify(
+                                        course,
+                                      )}&idx=${idx}`,
+                                    );
+                                  }}
                                   backgroundColor={
                                     backgroundColor[
                                       checkTime(

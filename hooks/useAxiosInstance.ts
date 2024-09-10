@@ -58,7 +58,7 @@ const useAxiosIns = () => {
       axios.interceptors.request.eject(requestIntercept);
       axios.interceptors.response.eject(responseIntercept);
     };
-  }, []);
+  }, [refreshToken]);
 
   return axiosIns;
 };
