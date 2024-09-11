@@ -38,6 +38,7 @@ export default function CourseDetailScreen() {
   const [assets] = useAssets([
     require('../../../assets/images/book.jpg'),
     require('../../../assets/images/Empty_courses.png'),
+    require('../../../assets/images/placeholder.png'),
   ]);
   const axios = useAxiosIns();
   const getCourseDetailQuery = useQuery({
@@ -204,7 +205,7 @@ export default function CourseDetailScreen() {
                             ? `${CONSTANTS.BACKEND_URL}${
                                 course!.user.profile_picture
                               }`
-                            : '',
+                            : assets?.[2].uri,
                           cache: 'force-cache',
                         }}
                       />

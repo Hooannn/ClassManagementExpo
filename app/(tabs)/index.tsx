@@ -27,6 +27,7 @@ export default function HomeScreen() {
   const axios = useAxiosIns();
   const [assets] = useAssets([
     require('../../assets/images/Empty_courses.png'),
+    require('../../assets/images/placeholder.png'),
   ]);
   const user = useProfileStore((state) => state.user);
 
@@ -60,7 +61,7 @@ export default function HomeScreen() {
                     source={{
                       uri: user?.profile_picture
                         ? `${CONSTANTS.BACKEND_URL}${user.profile_picture}`
-                        : '',
+                        : assets?.[1].uri,
                       cache: 'force-cache',
                     }}
                   />

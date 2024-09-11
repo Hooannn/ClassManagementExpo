@@ -44,6 +44,16 @@
       }
     },
     "owner": "hoanthui123",
-    "plugins": ["expo-font"]
+    "plugins": [
+      "expo-font",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Cho phép $(PRODUCT_NAME) truy cập vào máy ảnh",
+          "microphonePermission": "Cho phép $(PRODUCT_NAME) truy cập vào microphone",
+          "recordAudioAndroid": true
+        }
+      ]
+    ]
   }
 }

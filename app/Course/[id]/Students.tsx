@@ -15,18 +15,15 @@ import {
 import ProtectedScreen from '../../../components/shared/ProtectedScreen';
 import { useAssets } from 'expo-asset';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useAxiosIns } from '../../../hooks';
-import { useQuery } from '@tanstack/react-query';
-import { Enrollment, Response } from '../../../interfaces';
-import { ChevronLeft, ChevronRight, Filter } from '@tamagui/lucide-icons';
-import dayjs from 'dayjs';
-import { capitalize } from '../../../utils/stringFormat';
+import { Enrollment } from '../../../interfaces';
+import { ChevronLeft, Filter } from '@tamagui/lucide-icons';
 import { CONSTANTS } from '../../../constants';
 
 export default function Students() {
   const { id, enrollments: jsonEnrollments } = useLocalSearchParams();
   const [assets] = useAssets([
     require('../../../assets/images/Empty_courses.png'),
+    require('../../../assets/images/placeholder.png'),
   ]);
 
   const enrollments: Enrollment[] = JSON.parse(jsonEnrollments.toString());
@@ -80,7 +77,7 @@ export default function Students() {
                                   source={{
                                     uri: enrollment.student?.profile_picture
                                       ? `${CONSTANTS.BACKEND_URL}${enrollment.student.profile_picture}`
-                                      : '',
+                                      : assets?.[1].uri,
                                     cache: 'force-cache',
                                   }}
                                 />
