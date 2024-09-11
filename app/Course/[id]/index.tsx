@@ -11,6 +11,8 @@ import {
   YGroup,
   YStack,
   ScrollView,
+  Sheet,
+  Switch,
 } from 'tamagui';
 import ProtectedScreen from '../../../components/shared/ProtectedScreen';
 import {
@@ -27,12 +29,17 @@ import {
   Clock,
   NotebookPen,
   User,
+  MoreVertical,
+  Download,
+  ClipboardList,
+  CheckSquare,
 } from '@tamagui/lucide-icons';
 import { useAssets } from 'expo-asset';
 import { router } from 'expo-router';
 import dayjs from '../../../libs/dayjs';
 import { CONSTANTS } from '../../../constants';
 import { capitalize } from '../../../utils/stringFormat';
+import { useState } from 'react';
 export default function CourseDetailScreen() {
   const { id } = useLocalSearchParams();
   const [assets] = useAssets([
@@ -73,6 +80,8 @@ export default function CourseDetailScreen() {
     1: '$green4',
     2: '$gray4',
   };
+
+  const [shouldSettingOpen, setShouldSettingOpen] = useState(false);
   return (
     <ProtectedScreen>
       {getCourseDetailQuery.isLoading ? (
@@ -89,14 +98,22 @@ export default function CourseDetailScreen() {
             scrollEnabled={true}
           >
             <YStack gap="$1" flex={1}>
-              <XStack px="$5" ai={'center'} gap="$2">
+              <XStack px="$5" ai={'center'} jc="space-between">
+                <XStack gap="$2" ai={'center'}>
+                  <Button
+                    circular
+                    onPress={() => router.back()}
+                    icon={<ChevronLeft size={22} />}
+                    size="$4"
+                  ></Button>
+                  <Text fontSize={'$5'}>Chi tiết lớp học</Text>
+                </XStack>
                 <Button
+                  onPress={() => setShouldSettingOpen(true)}
                   circular
-                  onPress={() => router.back()}
-                  icon={<ChevronLeft size={22} />}
+                  icon={<MoreVertical size={20} color={'$gray11'} />}
                   size="$4"
                 ></Button>
-                <Text fontSize={'$5'}>Chi tiết lớp học</Text>
               </XStack>
               <Stack
                 backgroundColor={'white'}
@@ -323,6 +340,63 @@ export default function CourseDetailScreen() {
               </Stack>
             </YStack>
           </ScrollView>
+
+          <Sheet
+            forceRemoveScrollEnabled={shouldSettingOpen}
+            modal
+            snapPointsMode="fit"
+            open={shouldSettingOpen}
+            onOpenChange={setShouldSettingOpen}
+            dismissOnSnapToBottom
+            zIndex={100_000}
+            animation="medium"
+          >
+            <Sheet.Overlay
+              animation="lazy"
+              enterStyle={{ opacity: 0 }}
+              exitStyle={{ opacity: 0 }}
+            />
+
+            <Sheet.Handle />
+            <Sheet.Frame
+              pb="$6"
+              pt="$4"
+              justifyContent="center"
+              alignItems="center"
+            >
+              <YStack py="$2">
+                <Text fontSize={'$5'} fontWeight={'bold'}>
+                  Cài đặt
+                </Text>
+              </YStack>
+              <XStack
+                px="$6"
+                pressStyle={{
+                  backgroundColor: '$gray5',
+                }}
+                py="$3"
+                w="100%"
+                ai={'center'}
+                jc="space-between"
+              >
+                <Text>Xuất phiếu điểm</Text>
+                <ClipboardList color={'$gray10'} />
+              </XStack>
+              <XStack
+                px="$6"
+                pressStyle={{
+                  backgroundColor: '$gray5',
+                }}
+                py="$3"
+                w="100%"
+                ai={'center'}
+                jc="space-between"
+              >
+                <Text>Xuất báo cáo điểm danh</Text>
+                <CheckSquare color={'$gray10'} />
+              </XStack>
+            </Sheet.Frame>
+          </Sheet>
         </SafeAreaView>
       )}
     </ProtectedScreen>

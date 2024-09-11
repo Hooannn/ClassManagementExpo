@@ -59,14 +59,20 @@ export default function ClassSession() {
   const takeAttendancesByPictureMutation = useMutation({
     mutationFn: async (photoUri: string) => {
       const formData = new FormData();
-      formData.append('image', {
+      const file = {
         uri: photoUri,
         name: dayjs().format('YYYY-MM-DD-HH-mm-ss') + '.jpg',
         type: 'image/jpeg',
-      });
+      };
+      formData.append('file', file as any);
       return axios.post(
         `/api/v1/class-sessions/${session?.id}/attendance-records`,
         formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        },
       );
     },
   });

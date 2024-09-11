@@ -119,7 +119,7 @@ export default function HomeScreen() {
                                   <Text color="$gray11">{`Số sinh viên: ${course.enrollments.length}`}</Text>
                                 </YStack>
                               }
-                              icon={<Book size={20} color={'$blue10'} />}
+                              icon={<Book size={20} color={'$yellow11'} />}
                               iconAfter={ChevronRight}
                             />
                           </YGroup.Item>

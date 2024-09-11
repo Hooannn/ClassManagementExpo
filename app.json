@@ -53,6 +53,12 @@
           "microphonePermission": "Cho phép $(PRODUCT_NAME) truy cập vào microphone",
           "recordAudioAndroid": true
         }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Cho phép $(PRODUCT_NAME) truy cập vào thư viện ảnh"
+        }
       ]
     ]
   }

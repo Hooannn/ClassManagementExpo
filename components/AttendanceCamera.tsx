@@ -3,8 +3,9 @@ import { Stack, Text, Button, Image, XStack } from 'tamagui';
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import { useState } from 'react';
 import { useAssets } from 'expo-asset';
-import { SwitchCamera, Upload, X } from '@tamagui/lucide-icons';
+import { RefreshCw, Upload, X } from '@tamagui/lucide-icons';
 import { useToastController } from '@tamagui/toast';
+import * as ImagePicker from 'expo-image-picker';
 export interface AttendanceCameraProps {
   onCapture: (photo: string) => void;
   onDismiss: () => void;
@@ -73,6 +74,20 @@ export default function AttendanceCamera(props: AttendanceCameraProps) {
     }
     props.onCapture(photo.uri);
   };
+
+  const handlePickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: false,
+      allowsMultipleSelection: false,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      const asset = result.assets[0];
+      props.onCapture(asset.uri);
+    }
+  };
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Stack flex={1} ac="center" jc={'center'}>
@@ -108,7 +123,7 @@ export default function AttendanceCamera(props: AttendanceCameraProps) {
             jc="space-around"
           >
             <Button
-              disabled={!isCameraReady}
+              onPress={handlePickImage}
               circular
               size="$5"
               icon={<Upload size={20} color={'white'} />}
@@ -137,11 +152,10 @@ export default function AttendanceCamera(props: AttendanceCameraProps) {
             </Button>
 
             <Button
-              disabled={!isCameraReady}
               circular
               onPress={toggleCameraFacing}
               size="$5"
-              icon={<SwitchCamera size={20} color={'white'} />}
+              icon={<RefreshCw size={20} color={'white'} />}
               backgroundColor="rgba(0, 0, 0, 0.5)"
               pressStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }}
             />

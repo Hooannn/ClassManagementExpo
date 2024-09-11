@@ -1,45 +1,27 @@
-import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Tabs } from 'expo-router';
-
-/**
- * You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
- */
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>['name'];
-  color: string;
-}) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
-}
+import { Home, Settings } from '@tamagui/lucide-icons';
 
 export default function TabLayout() {
   return (
-    <Tabs screenOptions={{ headerShown: false }}>
+    <Tabs
+      screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: '#946800', // Active icon/text color (e.g., Tomato color)
+        tabBarInactiveTintColor: '#808080', // Inactive icon/text color (e.g., Grey color)
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
           title: 'Trang chủ',
-          tabBarIcon: ({ color }) => <TabBarIcon name="plane" color={color} />,
+          tabBarIcon: ({ color }) => <Home size={28} color={color} />,
         }}
       />
       <Tabs.Screen
-        name="Reports"
-        options={{
-          title: 'Reports',
-          tabBarIcon: ({ color }) => <TabBarIcon name="fire" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="Transactions"
-        options={{
-          title: 'Transactions',
-          tabBarIcon: ({ color }) => <TabBarIcon name="trophy" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="Wallets"
+        name="Settings"
         options={{
           title: 'Cài đặt',
-          tabBarIcon: ({ color }) => <TabBarIcon name="tags" color={color} />,
+          tabBarIcon: ({ color }) => <Settings size={28} color={color} />,
         }}
       />
     </Tabs>
