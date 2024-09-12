@@ -38,28 +38,28 @@ export default function Students() {
         </SafeAreaView>
       ) : (
         <SafeAreaView style={{ flex: 1 }}>
-          <ScrollView
-            horizontal={false}
-            showsHorizontalScrollIndicator={false}
-            scrollEnabled={true}
-          >
-            <YStack gap="$1" flex={1}>
-              <XStack px="$5" ai={'center'} justifyContent="space-between">
-                <XStack ai={'center'} gap="$2">
-                  <Button
-                    circular
-                    onPress={() => router.back()}
-                    icon={<ChevronLeft size={22} />}
-                    size="$4"
-                  ></Button>
-                  <Text fontSize={'$5'}>Danh sách sinh viên</Text>
-                </XStack>
+          <YStack gap="$1" flex={1}>
+            <XStack px="$5" ai={'center'} justifyContent="space-between">
+              <XStack ai={'center'} gap="$2">
                 <Button
                   circular
-                  icon={<Filter size={20} color={'$gray11'} />}
+                  onPress={() => router.back()}
+                  icon={<ChevronLeft size={22} />}
                   size="$4"
                 ></Button>
+                <Text fontSize={'$5'}>Danh sách sinh viên</Text>
               </XStack>
+              <Button
+                circular
+                icon={<Filter size={20} color={'$gray11'} />}
+                size="$4"
+              ></Button>
+            </XStack>
+            <ScrollView
+              horizontal={false}
+              showsHorizontalScrollIndicator={false}
+              scrollEnabled={true}
+            >
               <YStack px="$5" py="$2" gap="$2">
                 {enrollments.length > 0 ? (
                   <>
@@ -133,8 +133,8 @@ export default function Students() {
                   </YStack>
                 )}
               </YStack>
-            </YStack>
-          </ScrollView>
+            </ScrollView>
+          </YStack>
         </SafeAreaView>
       )}
     </ProtectedScreen>

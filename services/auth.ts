@@ -55,8 +55,46 @@ const useAuth = () => {
     },
   });
 
+  const forgotPasswordMutation = useMutation({
+    mutationFn: (params: { email: string }) =>
+      axios.post<Response<unknown>>('/api/v1/auth/forgot-password', {
+        email: params.email,
+      }),
+    onError: toastOnError,
+    onSuccess: (data) => {
+      const response = data.data;
+      toast.show('Thành công!', {
+        message: response?.message,
+        customData: {
+          theme: 'green',
+        },
+      });
+    },
+  });
+
+  const resetPasswordMutation = useMutation({
+    mutationFn: (params: { email: string; token: string; password: string }) =>
+      axios.post<Response<unknown>>('/api/v1/auth/reset-password', {
+        email: params.email,
+        token: params.token,
+        password: params.password,
+      }),
+    onError: toastOnError,
+    onSuccess: (data) => {
+      const response = data.data;
+      toast.show('Thành công!', {
+        message: response?.message,
+        customData: {
+          theme: 'green',
+        },
+      });
+    },
+  });
+
   return {
     signInMutation,
+    forgotPasswordMutation,
+    resetPasswordMutation,
   };
 };
 

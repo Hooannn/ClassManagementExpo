@@ -92,29 +92,29 @@ export default function CourseDetailScreen() {
         </SafeAreaView>
       ) : (
         <SafeAreaView style={{ flex: 1, paddingBottom: -insets.bottom }}>
-          <ScrollView
-            horizontal={false}
-            showsHorizontalScrollIndicator={false}
-            scrollEnabled={true}
-          >
-            <YStack gap="$1" flex={1}>
-              <XStack px="$5" ai={'center'} jc="space-between">
-                <XStack gap="$2" ai={'center'}>
-                  <Button
-                    circular
-                    onPress={() => router.back()}
-                    icon={<ChevronLeft size={22} />}
-                    size="$4"
-                  ></Button>
-                  <Text fontSize={'$5'}>Chi tiết lớp học</Text>
-                </XStack>
+          <YStack gap="$1" flex={1}>
+            <XStack px="$5" ai={'center'} jc="space-between">
+              <XStack gap="$2" ai={'center'}>
                 <Button
-                  onPress={() => setShouldSettingOpen(true)}
                   circular
-                  icon={<MoreVertical size={20} color={'$gray11'} />}
+                  onPress={() => router.back()}
+                  icon={<ChevronLeft size={22} />}
                   size="$4"
                 ></Button>
+                <Text fontSize={'$5'}>Chi tiết lớp học</Text>
               </XStack>
+              <Button
+                onPress={() => setShouldSettingOpen(true)}
+                circular
+                icon={<MoreVertical size={20} color={'$gray11'} />}
+                size="$4"
+              ></Button>
+            </XStack>
+            <ScrollView
+              horizontal={false}
+              showsHorizontalScrollIndicator={false}
+              scrollEnabled={true}
+            >
               <Stack
                 backgroundColor={'white'}
                 flex={1}
@@ -338,8 +338,8 @@ export default function CourseDetailScreen() {
                   </YStack>
                 </YStack>
               </Stack>
-            </YStack>
-          </ScrollView>
+            </ScrollView>
+          </YStack>
 
           <Sheet
             forceRemoveScrollEnabled={shouldSettingOpen}

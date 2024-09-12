@@ -1,21 +1,22 @@
 import React, { useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Input, YStack, Text, H3, Stack, Image } from 'tamagui';
-import { PrimaryButton, TextButton } from '../../components/widgets';
+import { PrimaryButton } from '../../components/widgets';
 import { useAuth } from '../../services';
 import { router } from 'expo-router';
 import { useAssets } from 'expo-asset';
 import { useToastController } from '@tamagui/toast';
-export default function SignIn() {
-  const [assets] = useAssets([require('../../assets/images/Login2.png')]);
-  const { signInMutation } = useAuth();
+export default function ForgotPassword() {
+  const [assets] = useAssets([
+    require('../../assets/images/ForgotPassword.png'),
+  ]);
+  const { forgotPasswordMutation } = useAuth();
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const toast = useToastController();
 
   const onSubmit = async () => {
-    if (email.trim() === '' || password.trim() === '') {
-      toast?.show('Hãy nhập đủ thông tin đăng nhập', {
+    if (email.trim() === '') {
+      toast?.show('Hãy nhập đủ thông tin', {
         native: false,
         customData: {
           theme: 'yellow',
@@ -23,7 +24,9 @@ export default function SignIn() {
       });
       return;
     }
-    await signInMutation.mutateAsync({ email, password });
+    await forgotPasswordMutation.mutateAsync({ email });
+    setEmail('');
+    router.push(`/Auth/ResetPassword?email=${email}`);
   };
 
   return (
@@ -41,7 +44,7 @@ export default function SignIn() {
           />
 
           <H3 textAlign="center" py="$4">
-            Nhập thông tin đăng nhập
+            Nhập email để lấy lại mật khẩu
           </H3>
           <Input
             placeholder={`johndoe@example.com`}
@@ -50,29 +53,21 @@ export default function SignIn() {
             onChange={(e) => setEmail(e.nativeEvent.text)}
             borderRadius={'$12'}
           />
-          <Input
-            placeholder={`******`}
-            size="$5"
-            value={password}
-            secureTextEntry={true}
-            onChange={(e) => setPassword(e.nativeEvent.text)}
-            borderRadius={'$12'}
-          />
           <PrimaryButton
-            isLoading={signInMutation.isLoading}
+            isLoading={forgotPasswordMutation.isLoading}
             onPress={onSubmit}
           >
-            Đăng nhập
+            Gửi yêu cầu
           </PrimaryButton>
           <Text
             onPress={() => {
-              router.push('/Auth/ForgotPassword');
+              router.back();
             }}
             textAlign="center"
             fontSize={'$3'}
             px="$8"
           >
-            <Text color={'$primary'}>Quên mật khẩu?</Text>
+            <Text color={'$primary'}>Quay lại</Text>
           </Text>
         </YStack>
       </YStack>

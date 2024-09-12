@@ -117,42 +117,41 @@ export default function ClassSession() {
               </Button>
             </Stack>
           )}
-
-          <ScrollView
-            flex={1}
-            horizontal={false}
-            showsHorizontalScrollIndicator={false}
-            scrollEnabled={true}
-          >
-            <YStack gap="$1" flex={1}>
-              <XStack px="$5" ai={'center'} justifyContent="space-between">
-                <XStack ai={'center'} gap="$2">
-                  <Button
-                    circular
-                    onPress={() => router.back()}
-                    icon={<ChevronLeft size={22} />}
-                    size="$4"
-                  ></Button>
-                  <YStack gap="$1">
-                    <Text fontSize={'$5'}>{`Buổi ${
-                      parseInt(idx.toString()) + 1
-                    } - ${capitalize(
-                      dayjs(session?.start_time).format('dddd DD/MM/YYYY'),
-                    )}`}</Text>
-                    <Text color="$gray11">{`Từ ${dayjs(
-                      session?.start_time,
-                    ).format('HH:mm')} đến ${dayjs(session?.end_time).format(
-                      'HH:mm',
-                    )}`}</Text>
-                  </YStack>
-                </XStack>
+          <YStack gap="$1" flex={1}>
+            <XStack px="$5" ai={'center'} justifyContent="space-between">
+              <XStack ai={'center'} gap="$2">
                 <Button
-                  onPress={() => setShouldSettingOpen(true)}
                   circular
-                  icon={<MoreVertical size={20} color={'$gray11'} />}
+                  onPress={() => router.back()}
+                  icon={<ChevronLeft size={22} />}
                   size="$4"
                 ></Button>
+                <YStack gap="$1">
+                  <Text fontSize={'$5'}>{`Buổi ${
+                    parseInt(idx.toString()) + 1
+                  } - ${capitalize(
+                    dayjs(session?.start_time).format('dddd DD/MM/YYYY'),
+                  )}`}</Text>
+                  <Text color="$gray11">{`Từ ${dayjs(
+                    session?.start_time,
+                  ).format('HH:mm')} đến ${dayjs(session?.end_time).format(
+                    'HH:mm',
+                  )}`}</Text>
+                </YStack>
               </XStack>
+              <Button
+                onPress={() => setShouldSettingOpen(true)}
+                circular
+                icon={<MoreVertical size={20} color={'$gray11'} />}
+                size="$4"
+              ></Button>
+            </XStack>
+            <ScrollView
+              flex={1}
+              horizontal={false}
+              showsHorizontalScrollIndicator={false}
+              scrollEnabled={true}
+            >
               <YStack gap="$2" px="$5" py="$2">
                 <Tabs
                   value={currentTab}
@@ -284,8 +283,8 @@ export default function ClassSession() {
                   </TabsContent>
                 </Tabs>
               </YStack>
-            </YStack>
-          </ScrollView>
+            </ScrollView>
+          </YStack>
 
           <Sheet
             forceRemoveScrollEnabled={shouldSettingOpen}

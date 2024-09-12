@@ -1,3 +1,4 @@
 export const CONSTANTS = {
-  BACKEND_URL: 'https://66151c469688d662b25c68facdaa3238.serveo.net',
+  BACKEND_URL:
+    'https://6c47-2001-ee0-4f0c-8c50-84a2-e935-50f3-9c41.ngrok-free.app',
 };
