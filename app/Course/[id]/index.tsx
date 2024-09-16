@@ -12,7 +12,9 @@ import {
   YStack,
   ScrollView,
   Sheet,
-  Switch,
+  H4,
+  H6,
+  H5,
 } from 'tamagui';
 import ProtectedScreen from '../../../components/shared/ProtectedScreen';
 import {
@@ -30,7 +32,6 @@ import {
   NotebookPen,
   User,
   MoreVertical,
-  Download,
   ClipboardList,
   CheckSquare,
 } from '@tamagui/lucide-icons';
@@ -47,7 +48,9 @@ export default function CourseDetailScreen() {
     require('../../../assets/images/Empty_courses.png'),
     require('../../../assets/images/placeholder.png'),
   ]);
+
   const axios = useAxiosIns();
+
   const getCourseDetailQuery = useQuery({
     queryKey: ['fetch/courseDetail', id],
     refetchOnWindowFocus: false,
@@ -97,6 +100,7 @@ export default function CourseDetailScreen() {
               <XStack gap="$2" ai={'center'}>
                 <Button
                   circular
+                  color={'$yellow11'}
                   onPress={() => router.back()}
                   icon={<ChevronLeft size={22} />}
                   size="$4"
@@ -106,7 +110,8 @@ export default function CourseDetailScreen() {
               <Button
                 onPress={() => setShouldSettingOpen(true)}
                 circular
-                icon={<MoreVertical size={20} color={'$gray11'} />}
+                color={'$yellow11'}
+                icon={<MoreVertical size={20} />}
                 size="$4"
               ></Button>
             </XStack>
@@ -145,10 +150,10 @@ export default function CourseDetailScreen() {
                   </Avatar>
                 </Stack>
                 <YStack pt="$12" px="$5" gap="$1">
-                  <Text fontSize="$5" fontWeight="bold">
+                  <H4>
                     {`Môn học: ${course!.subject.id} - ${course!.subject.name}`}
-                  </Text>
-                  <Text fontSize="$4">
+                  </H4>
+                  <Text fontSize="$4" mt="$2">
                     {`Năm học ${course!.year - 1}-${course!.year} - Học kỳ ${
                       course!.semester
                     }`}
@@ -164,6 +169,10 @@ export default function CourseDetailScreen() {
                         router.push(
                           `/Course/${id}/Students?enrollments=${JSON.stringify(
                             course?.enrollments,
+                          )}&grades=${JSON.stringify(
+                            course?.grades,
+                          )}&class_sessions=${JSON.stringify(
+                            course?.class_sessions,
                           )}`,
                         );
                       }}
@@ -229,10 +238,10 @@ export default function CourseDetailScreen() {
                       <Avatar.Fallback backgroundColor={'$gray10'} />
                     </Avatar>
                     <YStack gap="$1">
-                      <Text fontSize="$4" fontWeight="bold">{`${
-                        course!.user?.last_name
-                      } ${course!.user?.first_name}`}</Text>
-                      <Text>Giảng viên</Text>
+                      <Text fontSize={'$4'}>{`${course!.user?.last_name} ${
+                        course!.user?.first_name
+                      }`}</Text>
+                      <Text color={'$gray11'}>Giảng viên</Text>
                     </YStack>
                   </XStack>
                   <YStack gap="$2" my="$4">
@@ -357,7 +366,6 @@ export default function CourseDetailScreen() {
               exitStyle={{ opacity: 0 }}
             />
 
-            <Sheet.Handle />
             <Sheet.Frame
               pb="$6"
               pt="$4"

@@ -11,6 +11,8 @@ import {
   YGroup,
   Separator,
   ScrollView,
+  H4,
+  H3,
 } from 'tamagui';
 import dayjs from '../../libs/dayjs';
 import ProtectedScreen from '../../components/shared/ProtectedScreen';
@@ -73,10 +75,7 @@ export default function HomeScreen() {
             </XStack>
             <YStack gap="$5">
               <XStack ai={'center'}>
-                <Text fontSize="$4">Xin chào, </Text>
-                <Text fontWeight="bold" fontSize="$7">
-                  {name}
-                </Text>
+                <H3>Xin chào, {name}</H3>
               </XStack>
               <YStack gap="$2">
                 <XStack ai={'center'}>

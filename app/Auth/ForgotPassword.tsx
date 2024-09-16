@@ -6,6 +6,7 @@ import { useAuth } from '../../services';
 import { router } from 'expo-router';
 import { useAssets } from 'expo-asset';
 import { useToastController } from '@tamagui/toast';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 export default function ForgotPassword() {
   const [assets] = useAssets([
     require('../../assets/images/ForgotPassword.png'),
@@ -30,47 +31,51 @@ export default function ForgotPassword() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
-      <YStack px="$5" py="$8" flex={1}>
-        <YStack w={'100%'} gap="$3">
-          <Image
-            source={{
-              uri: assets?.[0].uri,
-            }}
-            h={200}
-            w={200}
-            marginHorizontal="auto"
-            objectFit="contain"
-          />
+    <KeyboardAwareScrollView style={{ flex: 1, backgroundColor: 'white' }}>
+      <SafeAreaView style={{ flex: 1 }}>
+        <YStack px="$5" py="$8" flex={1}>
+          <YStack w={'100%'} gap="$3">
+            <Image
+              source={{
+                uri: assets?.[0].uri,
+              }}
+              h={200}
+              w={200}
+              marginHorizontal="auto"
+              objectFit="contain"
+            />
 
-          <H3 textAlign="center" py="$4">
-            Nhập email để lấy lại mật khẩu
-          </H3>
-          <Input
-            placeholder={`johndoe@example.com`}
-            size="$5"
-            value={email}
-            onChange={(e) => setEmail(e.nativeEvent.text)}
-            borderRadius={'$12'}
-          />
-          <PrimaryButton
-            isLoading={forgotPasswordMutation.isLoading}
-            onPress={onSubmit}
-          >
-            Gửi yêu cầu
-          </PrimaryButton>
-          <Text
-            onPress={() => {
-              router.back();
-            }}
-            textAlign="center"
-            fontSize={'$3'}
-            px="$8"
-          >
-            <Text color={'$primary'}>Quay lại</Text>
-          </Text>
+            <H3 textAlign="center" py="$4">
+              Nhập email để lấy lại mật khẩu
+            </H3>
+            <Input
+              placeholder={`johndoe@example.com`}
+              size="$5"
+              returnKeyType="done"
+              onSubmitEditing={onSubmit}
+              value={email}
+              onChange={(e) => setEmail(e.nativeEvent.text)}
+              borderRadius={'$12'}
+            />
+            <PrimaryButton
+              isLoading={forgotPasswordMutation.isLoading}
+              onPress={onSubmit}
+            >
+              Gửi yêu cầu
+            </PrimaryButton>
+            <Text
+              onPress={() => {
+                router.back();
+              }}
+              textAlign="center"
+              fontSize={'$3'}
+              px="$8"
+            >
+              <Text color={'$primary'}>Quay lại</Text>
+            </Text>
+          </YStack>
         </YStack>
-      </YStack>
-    </SafeAreaView>
+      </SafeAreaView>
+    </KeyboardAwareScrollView>
   );
 }

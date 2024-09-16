@@ -122,6 +122,7 @@ export default function ClassSession() {
               <XStack ai={'center'} gap="$2">
                 <Button
                   circular
+                  color={'$yellow11'}
                   onPress={() => router.back()}
                   icon={<ChevronLeft size={22} />}
                   size="$4"
@@ -140,9 +141,10 @@ export default function ClassSession() {
                 </YStack>
               </XStack>
               <Button
+                color={'$yellow11'}
                 onPress={() => setShouldSettingOpen(true)}
                 circular
-                icon={<MoreVertical size={20} color={'$gray11'} />}
+                icon={<MoreVertical size={20} />}
                 size="$4"
               ></Button>
             </XStack>
@@ -302,7 +304,6 @@ export default function ClassSession() {
               exitStyle={{ opacity: 0 }}
             />
 
-            <Sheet.Handle />
             <Sheet.Frame
               pb="$6"
               pt="$4"

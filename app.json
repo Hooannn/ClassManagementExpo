@@ -26,10 +26,12 @@
       }
     },
     "android": {
+      "softwareKeyboardLayoutMode": "pan",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.classmanagement.app"
     },
     "androidStatusBar": {
       "barStyle": "light-content"

@@ -6,6 +6,8 @@ import { useAuth } from '../../services';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useAssets } from 'expo-asset';
 import { useToastController } from '@tamagui/toast';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { TextInput } from 'react-native';
 export default function ResetPassword() {
   const [assets] = useAssets([
     require('../../assets/images/ForgotPassword.png'),
@@ -48,68 +50,82 @@ export default function ResetPassword() {
     router.replace(`/Auth/SignIn`);
   };
 
+  const [confirmPasswordInputRef, setConfirmPasswordInputRef] =
+    useState<TextInput | null>(null);
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
-      <YStack px="$5" py="$8" flex={1}>
-        <YStack w={'100%'} gap="$3">
-          <Image
-            source={{
-              uri: assets?.[0].uri,
-            }}
-            h={200}
-            w={200}
-            marginHorizontal="auto"
-            objectFit="contain"
-          />
+    <KeyboardAwareScrollView style={{ flex: 1, backgroundColor: 'white' }}>
+      <SafeAreaView style={{ flex: 1 }}>
+        <YStack px="$5" py="$8" flex={1}>
+          <YStack w={'100%'} gap="$3">
+            <Image
+              source={{
+                uri: assets?.[0].uri,
+              }}
+              h={200}
+              w={200}
+              marginHorizontal="auto"
+              objectFit="contain"
+            />
 
-          <H3 textAlign="center" py="$4">
-            Nhập mã xác nhận và mật khẩu mới
-          </H3>
-          <Input
-            placeholder="Mã xác nhận"
-            size="$5"
-            value={token}
-            onChange={(e) => setToken(e.nativeEvent.text)}
-            borderRadius={'$12'}
-          />
-          <Input
-            placeholder="Mật khẩu mới"
-            size="$5"
-            autoComplete="off"
-            textContentType="none"
-            value={password}
-            onChange={(e) => setPassword(e.nativeEvent.text)}
-            borderRadius={'$12'}
-            secureTextEntry
-          />
-          <Input
-            placeholder="Xác nhận mật khẩu"
-            size="$5"
-            autoComplete="off"
-            textContentType="none"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.nativeEvent.text)}
-            borderRadius={'$12'}
-            secureTextEntry
-          />
-          <PrimaryButton
-            isLoading={resetPasswordMutation.isLoading}
-            onPress={onSubmit}
-          >
-            Xác nhận
-          </PrimaryButton>
-          <Text
-            onPress={() => {
-              router.back();
-            }}
-            textAlign="center"
-            fontSize={'$3'}
-            px="$8"
-          >
-            <Text color={'$primary'}>Quay lại</Text>
-          </Text>
+            <H3 textAlign="center" py="$4">
+              Nhập mã xác nhận và mật khẩu mới
+            </H3>
+            <Input
+              placeholder="Mã xác nhận"
+              size="$5"
+              value={token}
+              keyboardType="number-pad"
+              onChange={(e) => setToken(e.nativeEvent.text)}
+              borderRadius={'$12'}
+            />
+            <Input
+              placeholder="Mật khẩu mới"
+              size="$5"
+              autoComplete="off"
+              returnKeyType="next"
+              textContentType="none"
+              onSubmitEditing={() => {
+                confirmPasswordInputRef?.focus();
+              }}
+              value={password}
+              onChange={(e) => setPassword(e.nativeEvent.text)}
+              borderRadius={'$12'}
+              secureTextEntry
+            />
+            <Input
+              placeholder="Xác nhận mật khẩu"
+              size="$5"
+              autoComplete="off"
+              textContentType="none"
+              returnKeyType="done"
+              ref={(ref) => {
+                setConfirmPasswordInputRef(ref);
+              }}
+              onSubmitEditing={onSubmit}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.nativeEvent.text)}
+              borderRadius={'$12'}
+              secureTextEntry
+            />
+            <PrimaryButton
+              isLoading={resetPasswordMutation.isLoading}
+              onPress={onSubmit}
+            >
+              Xác nhận
+            </PrimaryButton>
+            <Text
+              onPress={() => {
+                router.back();
+              }}
+              textAlign="center"
+              fontSize={'$3'}
+              px="$8"
+            >
+              <Text color={'$primary'}>Quay lại</Text>
+            </Text>
+          </YStack>
         </YStack>
-      </YStack>
-    </SafeAreaView>
+      </SafeAreaView>
+    </KeyboardAwareScrollView>
   );
 }

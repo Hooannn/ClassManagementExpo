@@ -117,4 +117,5 @@ export interface Grade {
   midterm_grade: number;
   attendance_grade: number;
   lab_grade: number;
+  extra_grade: number;
 }
