@@ -79,7 +79,7 @@ export default function HomeScreen() {
               </XStack>
               <YStack gap="$2">
                 <XStack ai={'center'}>
-                  <Text fontWeight="500" fontSize="$5" color={'$gray12'}>
+                  <Text fontWeight="500" fontSize="$4" color={'$gray12'}>
                     Lớp học của bạn
                   </Text>
                 </XStack>

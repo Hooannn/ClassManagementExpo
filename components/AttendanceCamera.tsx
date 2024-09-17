@@ -1,4 +1,4 @@
-import { SafeAreaView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, Text, Button, Image, XStack } from 'tamagui';
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import { useState } from 'react';
@@ -23,7 +23,7 @@ export default function AttendanceCamera(props: AttendanceCameraProps) {
 
   if (!permission) {
     return (
-      <SafeAreaView style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
         <Stack flex={1} alignItems="center" jc={'center'}>
           <Image w={200} h={200} objectFit="contain" src={assets?.[0].uri} />
           <Text>Chúng tôi không thể truy cập camera của bạn</Text>
@@ -42,7 +42,7 @@ export default function AttendanceCamera(props: AttendanceCameraProps) {
 
   if (!permission.granted) {
     return (
-      <SafeAreaView style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
         <Stack flex={1} alignItems="center" jc={'center'}>
           <Image w={250} h={250} objectFit="contain" src={assets?.[1].uri} />
           <Text>Chúng tôi cần quyền truy cập vào camera</Text>

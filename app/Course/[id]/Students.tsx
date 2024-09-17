@@ -2,9 +2,9 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
-  SafeAreaView,
   TouchableWithoutFeedback,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   ScrollView,
   Spinner,
@@ -15,26 +15,16 @@ import {
   Text,
   Image,
   Sheet,
-  Adapt,
-  Dialog,
   Input,
   Checkbox,
   Label,
-  H3,
   H4,
 } from 'tamagui';
 import ProtectedScreen from '../../../components/shared/ProtectedScreen';
 import { useAssets } from 'expo-asset';
 import { router, useLocalSearchParams } from 'expo-router';
 import { ClassSession, Enrollment, Grade } from '../../../interfaces';
-import {
-  Check,
-  ChevronLeft,
-  Filter,
-  RefreshCcw,
-  Search,
-  X,
-} from '@tamagui/lucide-icons';
+import { Check, ChevronLeft, Filter, Search } from '@tamagui/lucide-icons';
 import StudentCard from '../../../components/StudentCard';
 import { useEffect, useState } from 'react';
 

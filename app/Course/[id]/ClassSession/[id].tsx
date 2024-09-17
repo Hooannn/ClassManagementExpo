@@ -1,4 +1,5 @@
 import { useLocalSearchParams, router } from 'expo-router';
+import Lottie from 'lottie-react-native';
 import {
   Button,
   Checkbox,
@@ -13,8 +14,13 @@ import {
   Text,
   XStack,
   YStack,
+  ZStack,
 } from 'tamagui';
-import { CourseDetail } from '../../../../interfaces';
+import {
+  AttendanceRecord,
+  CourseDetail,
+  Response,
+} from '../../../../interfaces';
 import {
   Check,
   ChevronLeft,
@@ -23,15 +29,17 @@ import {
   MoreVertical,
 } from '@tamagui/lucide-icons';
 import { useAssets } from 'expo-asset';
-import { SafeAreaView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import ProtectedScreen from '../../../../components/shared/ProtectedScreen';
 import { CONSTANTS } from '../../../../constants';
 import { capitalize } from '../../../../utils/stringFormat';
 import dayjs from '../../../../libs/dayjs';
 import { useState } from 'react';
 import AttendanceCamera from '../../../../components/AttendanceCamera';
-import { useAxiosIns } from '../../../../hooks';
-import { useMutation } from '@tanstack/react-query';
+import { useAxiosIns, useToast } from '../../../../hooks';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { Modal } from 'react-native';
+import TakeAttendanceResults from '../../../../components/TakeAttendanceResults';
 
 export default function ClassSession() {
   const axios = useAxiosIns();
@@ -55,6 +63,26 @@ export default function ClassSession() {
     useState(false);
 
   const [isTakingAttendance, setIsTakingAttendance] = useState(false);
+  const [shouldShowAttendanceResult, setShouldShowAttendanceResult] =
+    useState(false);
+
+  const [attendanceResults, setAttendanceResults] = useState<
+    AttendanceRecord[]
+  >([] as AttendanceRecord[]);
+
+  const { toastOnError } = useToast();
+
+  const getAttendanceRecordsQuery = useQuery({
+    queryKey: ['fetch/attendanceRecords/classSessionId', id],
+    refetchOnWindowFocus: false,
+    queryFn: () => {
+      return axios.get<Response<AttendanceRecord[]>>(
+        `/api/v1/class-sessions/${id}/attendance-records`,
+      );
+    },
+  });
+
+  const attendanceRecords = getAttendanceRecordsQuery.data?.data || [];
 
   const takeAttendancesByPictureMutation = useMutation({
     mutationFn: async (photoUri: string) => {
@@ -65,7 +93,7 @@ export default function ClassSession() {
         type: 'image/jpeg',
       };
       formData.append('file', file as any);
-      return axios.post(
+      return axios.post<Response<AttendanceRecord[]>>(
         `/api/v1/class-sessions/${session?.id}/attendance-records`,
         formData,
         {
@@ -75,6 +103,13 @@ export default function ClassSession() {
         },
       );
     },
+    onError: toastOnError,
+    onSuccess: (res) => {
+      if (!res.data?.data) return;
+      setAttendanceResults(res.data?.data || []);
+      setShouldShowAttendanceResult(true);
+      getAttendanceRecordsQuery.refetch();
+    },
   });
 
   const onImageCapture = async (uri: string) => {
@@ -82,272 +117,325 @@ export default function ClassSession() {
     await takeAttendancesByPictureMutation.mutateAsync(uri);
   };
   return (
-    <ProtectedScreen>
-      {isTakingAttendance ? (
-        <AttendanceCamera
-          onCapture={onImageCapture}
-          onDismiss={() => {
-            setIsTakingAttendance(false);
-          }}
-        />
+    <>
+      {takeAttendancesByPictureMutation.isLoading ? (
+        <ZStack animation={'100ms'} fullscreen>
+          <Stack alignItems="center" justifyContent="center" flex={1}>
+            <Lottie
+              autoPlay
+              loop
+              style={{ width: 200, height: 200 }}
+              source={require('../../../../assets/animations/taking_attendance.json')}
+            />
+            <Text color={'$gray11'} maxWidth={'50%'} textAlign="center">
+              Đang xử lý điểm danh sinh viên, vui lòng chờ trong giây lát...
+            </Text>
+          </Stack>
+        </ZStack>
       ) : (
-        <SafeAreaView style={{ flex: 1 }}>
-          {currentTab === 'classroom' && (
-            <Stack
-              position="absolute"
-              bottom={40}
-              zIndex={100}
-              w="100%"
-              left={0}
-              ai="center"
-              jc={'center'}
+        <ProtectedScreen>
+          <SafeAreaView style={{ flex: 1 }}>
+            <Modal
+              animationType="slide"
+              onDismiss={() => {
+                setAttendanceResults([]);
+                setShouldShowAttendanceResult(false);
+              }}
+              visible={shouldShowAttendanceResult}
+              onRequestClose={() => {
+                setAttendanceResults([]);
+                setShouldShowAttendanceResult(false);
+              }}
             >
-              <Button
-                theme="yellow_alt2"
-                fontWeight={'bold'}
-                onPress={() => {
-                  setIsTakingAttendance(true);
+              <TakeAttendanceResults
+                classSessionIdx={idx.toString()}
+                classSession={session}
+                photoEvidence={attendanceResults[0]?.photo_evidence || ''}
+                attendanceRecords={attendanceResults}
+                onDismiss={() => {
+                  setAttendanceResults([]);
+                  setShouldShowAttendanceResult(false);
                 }}
-                size={'$5'}
-                px="$8"
-                radiused
-                icon={<Hand size={18} />}
+              />
+            </Modal>
+            <Modal
+              animationType="slide"
+              transparent={true}
+              presentationStyle="fullScreen"
+              onDismiss={() => setIsTakingAttendance(false)}
+              visible={isTakingAttendance}
+              onRequestClose={() => setIsTakingAttendance(false)}
+            >
+              <AttendanceCamera
+                onCapture={onImageCapture}
+                onDismiss={() => {
+                  setIsTakingAttendance(false);
+                }}
+              />
+            </Modal>
+            {currentTab === 'classroom' && (
+              <Stack
+                position="absolute"
+                bottom={40}
+                zIndex={100}
+                w="100%"
+                left={0}
+                ai="center"
+                jc={'center'}
               >
-                Điểm danh
-              </Button>
-            </Stack>
-          )}
-          <YStack gap="$1" flex={1}>
-            <XStack px="$5" ai={'center'} justifyContent="space-between">
-              <XStack ai={'center'} gap="$2">
                 <Button
-                  circular
+                  theme="yellow_alt2"
+                  fontWeight={'bold'}
+                  onPress={() => {
+                    setIsTakingAttendance(true);
+                  }}
+                  size={'$5'}
+                  px="$8"
+                  radiused
+                  icon={<Hand size={18} />}
+                >
+                  Điểm danh
+                </Button>
+              </Stack>
+            )}
+            <YStack gap="$1" flex={1}>
+              <XStack px="$5" ai={'center'} justifyContent="space-between">
+                <XStack ai={'center'} gap="$2">
+                  <Button
+                    circular
+                    color={'$yellow11'}
+                    onPress={() => router.back()}
+                    icon={<ChevronLeft size={22} />}
+                    size="$4"
+                  ></Button>
+                  <YStack gap="$1">
+                    <Text fontSize={'$5'}>{`Buổi ${
+                      parseInt(idx.toString()) + 1
+                    } - ${capitalize(
+                      dayjs(session?.start_time).format('dddd DD/MM/YYYY'),
+                    )}`}</Text>
+                    <Text color="$gray11">{`Từ ${dayjs(
+                      session?.start_time,
+                    ).format('HH:mm')} đến ${dayjs(session?.end_time).format(
+                      'HH:mm',
+                    )}`}</Text>
+                  </YStack>
+                </XStack>
+                <Button
                   color={'$yellow11'}
-                  onPress={() => router.back()}
-                  icon={<ChevronLeft size={22} />}
+                  onPress={() => setShouldSettingOpen(true)}
+                  circular
+                  icon={<MoreVertical size={20} />}
                   size="$4"
                 ></Button>
-                <YStack gap="$1">
-                  <Text fontSize={'$5'}>{`Buổi ${
-                    parseInt(idx.toString()) + 1
-                  } - ${capitalize(
-                    dayjs(session?.start_time).format('dddd DD/MM/YYYY'),
-                  )}`}</Text>
-                  <Text color="$gray11">{`Từ ${dayjs(
-                    session?.start_time,
-                  ).format('HH:mm')} đến ${dayjs(session?.end_time).format(
-                    'HH:mm',
-                  )}`}</Text>
-                </YStack>
               </XStack>
-              <Button
-                color={'$yellow11'}
-                onPress={() => setShouldSettingOpen(true)}
-                circular
-                icon={<MoreVertical size={20} />}
-                size="$4"
-              ></Button>
-            </XStack>
-            <ScrollView
-              flex={1}
-              horizontal={false}
-              showsHorizontalScrollIndicator={false}
-              scrollEnabled={true}
-            >
-              <YStack gap="$2" px="$5" py="$2">
-                <Tabs
-                  value={currentTab}
-                  onValueChange={(value) => {
-                    setCurrentTab(value as 'classroom' | 'reports');
-                  }}
-                  borderRadius={0}
-                  orientation="horizontal"
-                  flexDirection="column"
-                  theme="yellow_alt1"
-                >
-                  <Tabs.List>
-                    <Tabs.Tab flex={1} value="classroom">
-                      <SizableText fontFamily="$body">Lớp học</SizableText>
-                    </Tabs.Tab>
-                    <Tabs.Tab flex={1} value="reports">
-                      <SizableText fontFamily="$body">Báo cáo</SizableText>
-                    </Tabs.Tab>
-                  </Tabs.List>
-                  <TabsContent value="classroom">
-                    <Stack flexDirection="row" mt="$3" flexWrap="wrap">
-                      {course.enrollments.map((enrollment, i) => (
-                        <Stack
-                          key={enrollment.student_id}
-                          width="25%"
-                          aspectRatio="3/4"
-                          justifyContent="center"
-                          alignItems="center"
-                          borderRadius={12}
-                          borderWidth={2}
-                          overflow="hidden"
-                          borderColor={'white'}
-                          p="$1"
-                        >
-                          <Stack
-                            position="absolute"
-                            top={0}
-                            left={0}
-                            width={20}
-                            h={20}
-                            backgroundColor={'white'}
-                            zIndex={99}
-                            alignItems="center"
-                            justifyContent="center"
-                            borderBottomRightRadius={12}
-                          >
-                            <Text fontSize="$1">{i + 1}</Text>
-                          </Stack>
-                          <Stack
-                            position="absolute"
-                            bottom={0}
-                            left={0}
-                            width="100%"
-                            h={24}
-                            zIndex={99}
-                            alignItems="center"
-                            justifyContent="center"
-                          >
-                            <Text
-                              fontSize="$2"
-                              fontWeight={'bold'}
-                              color={'$color.yellow11Light'}
-                            >
-                              {enrollment.student.first_name}
-                            </Text>
-                          </Stack>
-                          <Image
-                            objectFit="cover"
-                            w="100%"
-                            h="100%"
-                            source={{
-                              uri: enrollment.student?.profile_picture
-                                ? `${CONSTANTS.BACKEND_URL}${enrollment.student.profile_picture}`
-                                : '',
-                              cache: 'force-cache',
-                            }}
-                          ></Image>
-                        </Stack>
-                      ))}
-                    </Stack>
-                  </TabsContent>
-
-                  <TabsContent value="reports">
-                    <Stack gap w={'100%'} mt="$3">
-                      {/* Table Header */}
-                      <XStack
-                        backgroundColor="$gray5"
-                        py="$3"
-                        px="$2"
-                        justifyContent="space-between"
-                      >
-                        {headers.map((header, index) => (
-                          <YStack key={index} flex={1} alignItems="center">
-                            <Text theme={'yellow_alt2'} fontWeight="bold">
-                              {header}
-                            </Text>
-                          </YStack>
-                        ))}
-                      </XStack>
-
-                      {/* Table Rows */}
-                      {course.enrollments.map((enrollment, rowIndex) => (
-                        <XStack
-                          key={rowIndex}
-                          padding="$2"
-                          justifyContent="space-between"
-                          ai={'center'}
-                          borderBottomWidth={1}
-                          borderColor="$gray5"
-                        >
-                          <YStack flex={1}>
-                            <Text theme={'yellow_alt2'}>
-                              {enrollment.student_id}
-                            </Text>
-                          </YStack>
-                          <YStack flex={1}>
-                            <Text>{`${enrollment.student.last_name} ${enrollment.student.first_name}`}</Text>
-                          </YStack>
-                          <YStack flex={1} alignItems="center">
-                            <Checkbox id={enrollment.student_id}>
-                              <Checkbox.Indicator>
-                                <Check />
-                              </Checkbox.Indicator>
-                            </Checkbox>
-                          </YStack>
-                        </XStack>
-                      ))}
-                    </Stack>
-                  </TabsContent>
-                </Tabs>
-              </YStack>
-            </ScrollView>
-          </YStack>
-
-          <Sheet
-            forceRemoveScrollEnabled={shouldSettingOpen}
-            modal
-            snapPointsMode="fit"
-            open={shouldSettingOpen}
-            onOpenChange={setShouldSettingOpen}
-            dismissOnSnapToBottom
-            zIndex={100_000}
-            animation="medium"
-          >
-            <Sheet.Overlay
-              animation="lazy"
-              enterStyle={{ opacity: 0 }}
-              exitStyle={{ opacity: 0 }}
-            />
-
-            <Sheet.Frame
-              pb="$6"
-              pt="$4"
-              justifyContent="center"
-              alignItems="center"
-            >
-              <YStack py="$2">
-                <Text fontSize={'$5'} fontWeight={'bold'}>
-                  Cài đặt
-                </Text>
-              </YStack>
-              <XStack px="$6" py="$3" w="100%" ai={'center'} jc="space-between">
-                <Text>Điểm danh bằng tay</Text>
-                <Switch
-                  checked={acceptTakeManualAttendance}
-                  backgroundColor={
-                    acceptTakeManualAttendance ? '$green7' : '$gray5'
-                  }
-                  borderColor={
-                    acceptTakeManualAttendance ? '$green7' : '$gray5'
-                  }
-                  onCheckedChange={setAcceptTakeManualAttendance}
-                >
-                  <Switch.Thumb backgroundColor={'white'} animation="quick" />
-                </Switch>
-              </XStack>
-              <XStack
-                px="$6"
-                pressStyle={{
-                  backgroundColor: '$gray5',
-                }}
-                py="$3"
-                w="100%"
-                ai={'center'}
-                jc="space-between"
+              <ScrollView
+                flex={1}
+                horizontal={false}
+                showsHorizontalScrollIndicator={false}
+                scrollEnabled={true}
               >
-                <Text>Xuất báo cáo</Text>
-                <Download color={'$gray10'} />
-              </XStack>
-            </Sheet.Frame>
-          </Sheet>
-        </SafeAreaView>
+                <YStack gap="$2" px="$5" py="$2">
+                  <Tabs
+                    value={currentTab}
+                    onValueChange={(value) => {
+                      setCurrentTab(value as 'classroom' | 'reports');
+                    }}
+                    borderRadius={0}
+                    orientation="horizontal"
+                    flexDirection="column"
+                    theme="yellow_alt1"
+                  >
+                    <Tabs.List>
+                      <Tabs.Tab flex={1} value="classroom">
+                        <SizableText fontFamily="$body">Lớp học</SizableText>
+                      </Tabs.Tab>
+                      <Tabs.Tab flex={1} value="reports">
+                        <SizableText fontFamily="$body">Báo cáo</SizableText>
+                      </Tabs.Tab>
+                    </Tabs.List>
+                    <TabsContent value="classroom">
+                      <Stack flexDirection="row" mt="$3" flexWrap="wrap">
+                        {course.enrollments.map((enrollment, i) => (
+                          <Stack
+                            key={enrollment.student_id}
+                            width="25%"
+                            aspectRatio="3/4"
+                            justifyContent="center"
+                            alignItems="center"
+                            borderRadius={12}
+                            borderWidth={2}
+                            overflow="hidden"
+                            borderColor={'white'}
+                            p="$1"
+                          >
+                            <Stack
+                              position="absolute"
+                              top={0}
+                              left={0}
+                              width={20}
+                              h={20}
+                              backgroundColor={'white'}
+                              zIndex={99}
+                              alignItems="center"
+                              justifyContent="center"
+                              borderBottomRightRadius={12}
+                            >
+                              <Text fontSize="$1">{i + 1}</Text>
+                            </Stack>
+                            <Stack
+                              position="absolute"
+                              bottom={0}
+                              left={0}
+                              width="100%"
+                              h={24}
+                              zIndex={99}
+                              alignItems="center"
+                              justifyContent="center"
+                            >
+                              <Text
+                                fontSize="$2"
+                                fontWeight={'bold'}
+                                color={'$color.yellow11Light'}
+                              >
+                                {enrollment.student.first_name}
+                              </Text>
+                            </Stack>
+                            <Image
+                              objectFit="cover"
+                              w="100%"
+                              h="100%"
+                              source={{
+                                uri: enrollment.student?.profile_picture
+                                  ? `${CONSTANTS.BACKEND_URL}${enrollment.student.profile_picture}`
+                                  : '',
+                                cache: 'force-cache',
+                              }}
+                            ></Image>
+                          </Stack>
+                        ))}
+                      </Stack>
+                    </TabsContent>
+
+                    <TabsContent value="reports">
+                      <Stack gap w={'100%'} mt="$3">
+                        {/* Table Header */}
+                        <XStack
+                          backgroundColor="$gray5"
+                          py="$3"
+                          px="$2"
+                          justifyContent="space-between"
+                        >
+                          {headers.map((header, index) => (
+                            <YStack key={index} flex={1} alignItems="center">
+                              <Text theme={'yellow_alt2'} fontWeight="bold">
+                                {header}
+                              </Text>
+                            </YStack>
+                          ))}
+                        </XStack>
+
+                        {/* Table Rows */}
+                        {course.enrollments.map((enrollment, rowIndex) => (
+                          <XStack
+                            key={rowIndex}
+                            padding="$2"
+                            justifyContent="space-between"
+                            ai={'center'}
+                            borderBottomWidth={1}
+                            borderColor="$gray5"
+                          >
+                            <YStack flex={1}>
+                              <Text theme={'yellow_alt2'}>
+                                {enrollment.student_id}
+                              </Text>
+                            </YStack>
+                            <YStack flex={1}>
+                              <Text>{`${enrollment.student.last_name} ${enrollment.student.first_name}`}</Text>
+                            </YStack>
+                            <YStack flex={1} alignItems="center">
+                              <Checkbox id={enrollment.student_id}>
+                                <Checkbox.Indicator>
+                                  <Check />
+                                </Checkbox.Indicator>
+                              </Checkbox>
+                            </YStack>
+                          </XStack>
+                        ))}
+                      </Stack>
+                    </TabsContent>
+                  </Tabs>
+                </YStack>
+              </ScrollView>
+            </YStack>
+
+            <Sheet
+              forceRemoveScrollEnabled={shouldSettingOpen}
+              modal
+              snapPointsMode="fit"
+              open={shouldSettingOpen}
+              onOpenChange={setShouldSettingOpen}
+              dismissOnSnapToBottom
+              zIndex={100_000}
+              animation="medium"
+            >
+              <Sheet.Overlay
+                animation="lazy"
+                enterStyle={{ opacity: 0 }}
+                exitStyle={{ opacity: 0 }}
+              />
+
+              <Sheet.Frame
+                pb="$6"
+                pt="$4"
+                justifyContent="center"
+                alignItems="center"
+              >
+                <YStack py="$2">
+                  <Text fontSize={'$5'} fontWeight={'bold'}>
+                    Cài đặt
+                  </Text>
+                </YStack>
+                <XStack
+                  px="$6"
+                  py="$3"
+                  w="100%"
+                  ai={'center'}
+                  jc="space-between"
+                >
+                  <Text>Điểm danh bằng tay</Text>
+                  <Switch
+                    checked={acceptTakeManualAttendance}
+                    backgroundColor={
+                      acceptTakeManualAttendance ? '$green7' : '$gray5'
+                    }
+                    borderColor={
+                      acceptTakeManualAttendance ? '$green7' : '$gray5'
+                    }
+                    onCheckedChange={setAcceptTakeManualAttendance}
+                  >
+                    <Switch.Thumb backgroundColor={'white'} animation="quick" />
+                  </Switch>
+                </XStack>
+                <XStack
+                  px="$6"
+                  pressStyle={{
+                    backgroundColor: '$gray5',
+                  }}
+                  py="$3"
+                  w="100%"
+                  ai={'center'}
+                  jc="space-between"
+                >
+                  <Text>Xuất báo cáo</Text>
+                  <Download color={'$gray10'} />
+                </XStack>
+              </Sheet.Frame>
+            </Sheet>
+          </SafeAreaView>
+        </ProtectedScreen>
       )}
-    </ProtectedScreen>
+    </>
   );
 }
 
