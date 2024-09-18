@@ -27,6 +27,7 @@ import { ClassSession, Enrollment, Grade } from '../../../interfaces';
 import { Check, ChevronLeft, Filter, Search } from '@tamagui/lucide-icons';
 import StudentCard from '../../../components/StudentCard';
 import { useEffect, useState } from 'react';
+import StudentDetailSheet from '../../../components/StudentDetailSheet';
 
 export default function Students() {
   const {
@@ -128,6 +129,14 @@ export default function Students() {
     return results;
   };
 
+  const [shouldOpenStudentDetailSheet, setShouldOpenStudentDetailSheet] =
+    useState(false);
+
+  const [selectedEnrollment, setSelectedEnrollment] = useState<Enrollment>();
+  const selectedGrade = grades?.find(
+    (grade) => grade.student_id === selectedEnrollment?.student_id,
+  );
+
   return (
     <ProtectedScreen>
       {false ? (
@@ -182,14 +191,23 @@ export default function Students() {
                 <YStack px="$5" py="$2" gap="$2">
                   {filterEnrollments().length > 0 ? (
                     <>
+                      {selectedEnrollment && (
+                        <StudentDetailSheet
+                          enrollment={selectedEnrollment}
+                          grade={selectedGrade}
+                          shouldOpen={shouldOpenStudentDetailSheet}
+                          setShouldOpen={setShouldOpenStudentDetailSheet}
+                          classSessions={classSessions}
+                          onSaveChanges={() => {}}
+                        />
+                      )}
                       {filterEnrollments().map((enrollment, idx) => (
                         <StudentCard
                           enrollment={enrollment}
-                          grade={grades?.find(
-                            (grade) =>
-                              grade.student_id === enrollment.student_id,
-                          )}
-                          classSessions={classSessions}
+                          onPress={() => {
+                            setSelectedEnrollment(enrollment);
+                            setShouldOpenStudentDetailSheet(true);
+                          }}
                           key={enrollment.student_id + idx}
                         />
                       ))}

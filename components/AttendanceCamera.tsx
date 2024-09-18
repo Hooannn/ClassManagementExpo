@@ -1,4 +1,4 @@
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { Stack, Text, Button, Image, XStack } from 'tamagui';
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import { useState } from 'react';
@@ -23,34 +23,38 @@ export default function AttendanceCamera(props: AttendanceCameraProps) {
 
   if (!permission) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
-        <Stack flex={1} alignItems="center" jc={'center'}>
-          <Image w={200} h={200} objectFit="contain" src={assets?.[0].uri} />
-          <Text>Chúng tôi không thể truy cập camera của bạn</Text>
-          <Button
-            mt="$2"
-            theme={'yellow_alt2'}
-            variant="outlined"
-            onPress={props.onDismiss}
-          >
-            Quay lại
-          </Button>
-        </Stack>
-      </SafeAreaView>
+      <SafeAreaProvider>
+        <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
+          <Stack flex={1} alignItems="center" jc={'center'}>
+            <Image w={200} h={200} objectFit="contain" src={assets?.[0].uri} />
+            <Text>Chúng tôi không thể truy cập camera của bạn</Text>
+            <Button
+              mt="$2"
+              theme={'yellow_alt2'}
+              variant="outlined"
+              onPress={props.onDismiss}
+            >
+              Quay lại
+            </Button>
+          </Stack>
+        </SafeAreaView>
+      </SafeAreaProvider>
     );
   }
 
   if (!permission.granted) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
-        <Stack flex={1} alignItems="center" jc={'center'}>
-          <Image w={250} h={250} objectFit="contain" src={assets?.[1].uri} />
-          <Text>Chúng tôi cần quyền truy cập vào camera</Text>
-          <Button mt="$2" theme={'yellow_alt2'} onPress={requestPermission}>
-            Cấp quyền
-          </Button>
-        </Stack>
-      </SafeAreaView>
+      <SafeAreaProvider>
+        <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
+          <Stack flex={1} alignItems="center" jc={'center'}>
+            <Image w={250} h={250} objectFit="contain" src={assets?.[1].uri} />
+            <Text>Chúng tôi cần quyền truy cập vào camera</Text>
+            <Button mt="$2" theme={'yellow_alt2'} onPress={requestPermission}>
+              Cấp quyền
+            </Button>
+          </Stack>
+        </SafeAreaView>
+      </SafeAreaProvider>
     );
   }
 
@@ -89,79 +93,81 @@ export default function AttendanceCamera(props: AttendanceCameraProps) {
     }
   };
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <Stack flex={1} ac="center" jc={'center'}>
-        <CameraView
-          ref={(ref) => {
-            setCameraRef(ref);
-          }}
-          onCameraReady={() => {
-            setCameraReady(true);
-          }}
-          style={{
-            flex: 1,
-          }}
-          facing={facing}
-        >
-          <Button
-            onPress={props.onDismiss}
-            circular
-            position="absolute"
-            top={16}
-            right={16}
-            size="$3"
-            icon={<X size={18} color={'white'} />}
-            backgroundColor="rgba(0, 0, 0, 0.5)"
-            pressStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }}
-          />
-          <XStack
-            position="absolute"
-            bottom={32}
-            left={0}
-            w={'100%'}
-            ai="center"
-            jc="space-around"
+    <SafeAreaProvider>
+      <SafeAreaView style={{ flex: 1 }}>
+        <Stack flex={1} ac="center" jc={'center'}>
+          <CameraView
+            ref={(ref) => {
+              setCameraRef(ref);
+            }}
+            onCameraReady={() => {
+              setCameraReady(true);
+            }}
+            style={{
+              flex: 1,
+            }}
+            facing={facing}
           >
             <Button
-              onPress={handlePickImage}
+              onPress={props.onDismiss}
               circular
-              size="$5"
-              icon={<Upload size={20} color={'white'} />}
+              position="absolute"
+              top={16}
+              right={16}
+              size="$3"
+              icon={<X size={18} color={'white'} />}
               backgroundColor="rgba(0, 0, 0, 0.5)"
               pressStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }}
             />
-
-            <Button
-              disabled={!isCameraReady}
-              circular
-              onPress={handleCapture}
-              size="$8"
-              backgroundColor="$color7"
-              pressStyle={{ backgroundColor: '$color8' }}
-              borderWidth={3}
-              borderColor="$color9"
+            <XStack
+              position="absolute"
+              bottom={32}
+              left={0}
+              w={'100%'}
+              ai="center"
+              jc="space-around"
             >
-              <Stack
-                width={75}
-                height={75}
-                backgroundColor="$color7"
-                borderRadius={100}
-                borderWidth={3}
-                borderColor="$color11"
+              <Button
+                onPress={handlePickImage}
+                circular
+                size="$5"
+                icon={<Upload size={20} color={'white'} />}
+                backgroundColor="rgba(0, 0, 0, 0.5)"
+                pressStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }}
               />
-            </Button>
 
-            <Button
-              circular
-              onPress={toggleCameraFacing}
-              size="$5"
-              icon={<RefreshCw size={20} color={'white'} />}
-              backgroundColor="rgba(0, 0, 0, 0.5)"
-              pressStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }}
-            />
-          </XStack>
-        </CameraView>
-      </Stack>
-    </SafeAreaView>
+              <Button
+                disabled={!isCameraReady}
+                circular
+                onPress={handleCapture}
+                size="$8"
+                backgroundColor="$color7"
+                pressStyle={{ backgroundColor: '$color8' }}
+                borderWidth={3}
+                borderColor="$color9"
+              >
+                <Stack
+                  width={75}
+                  height={75}
+                  backgroundColor="$color7"
+                  borderRadius={100}
+                  borderWidth={3}
+                  borderColor="$color11"
+                />
+              </Button>
+
+              <Button
+                circular
+                onPress={toggleCameraFacing}
+                size="$5"
+                icon={<RefreshCw size={20} color={'white'} />}
+                backgroundColor="rgba(0, 0, 0, 0.5)"
+                pressStyle={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }}
+              />
+            </XStack>
+          </CameraView>
+        </Stack>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }

@@ -31,7 +31,10 @@ export default function ForgotPassword() {
   };
 
   return (
-    <KeyboardAwareScrollView style={{ flex: 1, backgroundColor: 'white' }}>
+    <KeyboardAwareScrollView
+      enableOnAndroid
+      style={{ flex: 1, backgroundColor: 'white' }}
+    >
       <SafeAreaView style={{ flex: 1 }}>
         <YStack px="$5" py="$8" flex={1}>
           <YStack w={'100%'} gap="$3">

@@ -7,6 +7,7 @@ import {
   ScrollView,
   Sheet,
   SizableText,
+  Spinner,
   Stack,
   Switch,
   Tabs,
@@ -18,6 +19,7 @@ import {
 } from 'tamagui';
 import {
   AttendanceRecord,
+  AttendanceStatus,
   CourseDetail,
   Response,
 } from '../../../../interfaces';
@@ -82,7 +84,7 @@ export default function ClassSession() {
     },
   });
 
-  const attendanceRecords = getAttendanceRecordsQuery.data?.data || [];
+  const attendanceRecords = getAttendanceRecordsQuery.data?.data?.data || [];
 
   const takeAttendancesByPictureMutation = useMutation({
     mutationFn: async (photoUri: string) => {
@@ -112,9 +114,59 @@ export default function ClassSession() {
     },
   });
 
+  const deleteAttandanceRecordMutation = useMutation({
+    mutationFn: async (studentId: string) =>
+      axios.delete<Response<unknown>>(
+        `/api/v1/class-sessions/${session?.id}/attendance-records/${studentId}`,
+      ),
+    onError: toastOnError,
+    onSuccess: () => {
+      getAttendanceRecordsQuery.refetch();
+    },
+  });
+
+  const takeAttendanceByManualMutation = useMutation({
+    mutationFn: async (studentId: string) =>
+      axios.post<Response<unknown>>(
+        `/api/v1/class-sessions/${session?.id}/attendance-records/${studentId}`,
+      ),
+    onError: toastOnError,
+    onSuccess: () => {
+      getAttendanceRecordsQuery.refetch();
+    },
+  });
+
   const onImageCapture = async (uri: string) => {
     setIsTakingAttendance(false);
     await takeAttendancesByPictureMutation.mutateAsync(uri);
+  };
+
+  const isPresent = (studentId: string) => {
+    return attendanceRecords.some(
+      (record) =>
+        record.student_id === studentId &&
+        record.status === AttendanceStatus.PRESENT,
+    );
+  };
+
+  const onAttandanceCheckboxPress = (studentId: string) => () => {
+    if (!acceptTakeManualAttendance) return;
+    const isPresent = attendanceRecords.some(
+      (record) =>
+        record.student_id === studentId &&
+        record.status === AttendanceStatus.PRESENT,
+    );
+    if (isPresent) {
+      const record = attendanceRecords.find(
+        (record) =>
+          record.student_id === studentId &&
+          record.status === AttendanceStatus.PRESENT,
+      );
+      if (!record) return;
+      deleteAttandanceRecordMutation.mutate(record.student_id);
+    } else {
+      takeAttendanceByManualMutation.mutate(studentId);
+    }
   };
   return (
     <>
@@ -318,51 +370,60 @@ export default function ClassSession() {
                     </TabsContent>
 
                     <TabsContent value="reports">
-                      <Stack gap w={'100%'} mt="$3">
-                        {/* Table Header */}
-                        <XStack
-                          backgroundColor="$gray5"
-                          py="$3"
-                          px="$2"
-                          justifyContent="space-between"
-                        >
-                          {headers.map((header, index) => (
-                            <YStack key={index} flex={1} alignItems="center">
-                              <Text theme={'yellow_alt2'} fontWeight="bold">
-                                {header}
-                              </Text>
-                            </YStack>
-                          ))}
-                        </XStack>
-
-                        {/* Table Rows */}
-                        {course.enrollments.map((enrollment, rowIndex) => (
+                      {getAttendanceRecordsQuery.isLoading ? (
+                        <Stack w={'100%'} mt="$6" jc="center" ai="center">
+                          <Spinner size="large" />
+                        </Stack>
+                      ) : (
+                        <Stack w={'100%'} mt="$3">
                           <XStack
-                            key={rowIndex}
-                            padding="$2"
+                            backgroundColor="$gray5"
+                            py="$3"
+                            px="$2"
                             justifyContent="space-between"
-                            ai={'center'}
-                            borderBottomWidth={1}
-                            borderColor="$gray5"
                           >
-                            <YStack flex={1}>
-                              <Text theme={'yellow_alt2'}>
-                                {enrollment.student_id}
-                              </Text>
-                            </YStack>
-                            <YStack flex={1}>
-                              <Text>{`${enrollment.student.last_name} ${enrollment.student.first_name}`}</Text>
-                            </YStack>
-                            <YStack flex={1} alignItems="center">
-                              <Checkbox id={enrollment.student_id}>
-                                <Checkbox.Indicator>
-                                  <Check />
-                                </Checkbox.Indicator>
-                              </Checkbox>
-                            </YStack>
+                            {headers.map((header, index) => (
+                              <YStack key={index} flex={1} alignItems="center">
+                                <Text theme={'yellow_alt2'} fontWeight="bold">
+                                  {header}
+                                </Text>
+                              </YStack>
+                            ))}
                           </XStack>
-                        ))}
-                      </Stack>
+                          {course.enrollments.map((enrollment, rowIndex) => (
+                            <XStack
+                              key={rowIndex}
+                              padding="$2"
+                              justifyContent="space-between"
+                              ai={'center'}
+                              borderBottomWidth={1}
+                              borderColor="$gray5"
+                            >
+                              <YStack flex={1}>
+                                <Text theme={'yellow_alt2'}>
+                                  {enrollment.student_id}
+                                </Text>
+                              </YStack>
+                              <YStack flex={1}>
+                                <Text>{`${enrollment.student.last_name} ${enrollment.student.first_name}`}</Text>
+                              </YStack>
+                              <YStack flex={1} alignItems="center">
+                                <Checkbox
+                                  onPress={onAttandanceCheckboxPress(
+                                    enrollment.student_id,
+                                  )}
+                                  id={enrollment.student_id}
+                                  checked={isPresent(enrollment.student_id)}
+                                >
+                                  <Checkbox.Indicator>
+                                    <Check />
+                                  </Checkbox.Indicator>
+                                </Checkbox>
+                              </YStack>
+                            </XStack>
+                          ))}
+                        </Stack>
+                      )}
                     </TabsContent>
                   </Tabs>
                 </YStack>
