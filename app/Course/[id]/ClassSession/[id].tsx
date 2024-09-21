@@ -72,7 +72,7 @@ export default function ClassSession() {
     AttendanceRecord[]
   >([] as AttendanceRecord[]);
 
-  const { toastOnError } = useToast();
+  const { toastOnError, toast } = useToast();
 
   const getAttendanceRecordsQuery = useQuery({
     queryKey: ['fetch/attendanceRecords/classSessionId', id],
@@ -150,7 +150,15 @@ export default function ClassSession() {
   };
 
   const onAttandanceCheckboxPress = (studentId: string) => () => {
-    if (!acceptTakeManualAttendance) return;
+    if (!acceptTakeManualAttendance) {
+      toast?.show('Hãy bật điểm danh bằng tay để tiếp tục', {
+        native: false,
+        customData: {
+          theme: 'yellow',
+        },
+      });
+      return;
+    }
     const isPresent = attendanceRecords.some(
       (record) =>
         record.student_id === studentId &&
@@ -186,6 +194,19 @@ export default function ClassSession() {
         </ZStack>
       ) : (
         <ProtectedScreen>
+          {(takeAttendanceByManualMutation.isLoading ||
+            deleteAttandanceRecordMutation.isLoading) && (
+            <ZStack
+              animation={'100ms'}
+              fullscreen
+              backgroundColor="rgba(0, 0, 0, 0.4)"
+              zIndex={99}
+            >
+              <Stack alignItems="center" justifyContent="center" flex={1}>
+                <Spinner size="large" color={'$yellow11'} />
+              </Stack>
+            </ZStack>
+          )}
           <SafeAreaView style={{ flex: 1 }}>
             <Modal
               animationType="slide"

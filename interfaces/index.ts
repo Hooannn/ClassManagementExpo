@@ -59,7 +59,6 @@ export interface Course {
 export interface CourseDetail extends Course {
   course_notes: CourseNote[];
   class_sessions: ClassSession[];
-  grades: Grade[];
   user: User;
 }
 

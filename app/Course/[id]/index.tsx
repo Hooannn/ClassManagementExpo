@@ -169,8 +169,6 @@ export default function CourseDetailScreen() {
                         router.push(
                           `/Course/${id}/Students?enrollments=${JSON.stringify(
                             course?.enrollments,
-                          )}&grades=${JSON.stringify(
-                            course?.grades,
                           )}&class_sessions=${JSON.stringify(
                             course?.class_sessions,
                           )}`,

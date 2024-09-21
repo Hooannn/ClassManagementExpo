@@ -23,19 +23,15 @@ import {
 import ProtectedScreen from '../../../components/shared/ProtectedScreen';
 import { useAssets } from 'expo-asset';
 import { router, useLocalSearchParams } from 'expo-router';
-import { ClassSession, Enrollment, Grade } from '../../../interfaces';
+import { ClassSession, Enrollment } from '../../../interfaces';
 import { Check, ChevronLeft, Filter, Search } from '@tamagui/lucide-icons';
 import StudentCard from '../../../components/StudentCard';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import StudentDetailSheet from '../../../components/StudentDetailSheet';
 
 export default function Students() {
-  const {
-    id,
-    enrollments: jsonEnrollments,
-    grades: jsonGrades,
-    class_sessions: jsonClassSessions,
-  } = useLocalSearchParams();
+  const { enrollments: jsonEnrollments, class_sessions: jsonClassSessions } =
+    useLocalSearchParams();
   const [assets] = useAssets([
     require('../../../assets/images/Empty_courses.png'),
   ]);
@@ -43,7 +39,6 @@ export default function Students() {
   const enrollments: Enrollment[] = jsonEnrollments
     ? JSON.parse(jsonEnrollments.toString())
     : [];
-  const grades: Grade[] = jsonGrades ? JSON.parse(jsonGrades.toString()) : [];
   const classSessions: ClassSession[] = jsonClassSessions
     ? JSON.parse(jsonClassSessions.toString())
     : [];
@@ -133,9 +128,6 @@ export default function Students() {
     useState(false);
 
   const [selectedEnrollment, setSelectedEnrollment] = useState<Enrollment>();
-  const selectedGrade = grades?.find(
-    (grade) => grade.student_id === selectedEnrollment?.student_id,
-  );
 
   return (
     <ProtectedScreen>
@@ -194,11 +186,9 @@ export default function Students() {
                       {selectedEnrollment && (
                         <StudentDetailSheet
                           enrollment={selectedEnrollment}
-                          grade={selectedGrade}
                           shouldOpen={shouldOpenStudentDetailSheet}
                           setShouldOpen={setShouldOpenStudentDetailSheet}
                           classSessions={classSessions}
-                          onSaveChanges={() => {}}
                         />
                       )}
                       {filterEnrollments().map((enrollment, idx) => (
