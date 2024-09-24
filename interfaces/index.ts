@@ -1,6 +1,10 @@
 export * from './response.interface';
 
-export interface User {
+export interface Base {
+  created_at: string;
+  updated_at: string;
+}
+export interface User extends Base {
   id: number;
   email: string;
   first_name: string;
@@ -8,18 +12,14 @@ export interface User {
   profile_picture: string;
   is_male: boolean;
   is_admin: boolean;
-  created_at: string;
-  updated_at: string;
 }
 
-export interface Class {
+export interface Class extends Base {
   id: string;
   name: string;
-  created_at: string;
-  updated_at: string;
 }
 
-export interface Student {
+export interface Student extends Base {
   id: string;
   email: string;
   first_name: string;
@@ -29,19 +29,15 @@ export interface Student {
   is_male: boolean;
   class_id: string;
   class_: Class;
-  created_at: string;
-  updated_at: string;
 }
 
-export interface Subject {
+export interface Subject extends Base {
   id: string;
   name: string;
   credit: number;
-  created_at: string;
-  updated_at: string;
 }
 
-export interface Course {
+export interface Course extends Base {
   id: number;
   description: string;
   semester: number;
@@ -49,15 +45,12 @@ export interface Course {
   start_time: string;
   end_time: string;
   subject_id: string;
-  created_at: string;
-  updated_at: string;
   user_id: number;
   subject: Subject;
   enrollments: Enrollment[];
 }
 
 export interface CourseDetail extends Course {
-  course_notes: CourseNote[];
   class_sessions: ClassSession[];
   user: User;
 }
@@ -69,16 +62,14 @@ export enum EnrollmentStatus {
   DROPPED = 'DROPPED',
 }
 
-export interface Enrollment {
+export interface Enrollment extends Base {
   course_id: number;
   student_id: string;
-  created_at: string;
-  updated_at: string;
   status: any;
   student: Student;
 }
 
-export interface ClassSession {
+export interface ClassSession extends Base {
   id: number;
   start_time: string;
   end_time: string;
@@ -86,11 +77,10 @@ export interface ClassSession {
   course: Course;
 }
 
-export interface CourseNote {
+export interface CourseNote extends Base {
   id: number;
   title: string;
   content: string;
-  attachment: string;
   course_id: number;
   course: Course;
 }
@@ -100,7 +90,7 @@ export enum AttendanceStatus {
   ABSENT = 'ABSENT',
 }
 
-export interface AttendanceRecord {
+export interface AttendanceRecord extends Base {
   student_id: string;
   class_session_id: number;
   status: any;
@@ -109,7 +99,7 @@ export interface AttendanceRecord {
   class_session: ClassSession;
 }
 
-export interface Grade {
+export interface Grade extends Base {
   student_id: string;
   course_id: number;
   final_grade: number;

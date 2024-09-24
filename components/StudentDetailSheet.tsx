@@ -214,6 +214,7 @@ export default function StudentDetailSheet({
       <Sheet.Frame pb="$6" pt="$2" px="$5" alignItems="center">
         <XStack py="$2" jc="space-between" w="100%">
           <Button
+            width={65}
             onPress={() => {
               setShouldOpen(false);
             }}
@@ -248,6 +249,7 @@ export default function StudentDetailSheet({
             </XStack>
           </YStack>
           <Button
+            width={65}
             onPress={onSaveChanges}
             disabled={saveGradesMutation.isLoading}
             color="$yellow11"

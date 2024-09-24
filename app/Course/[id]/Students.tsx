@@ -253,6 +253,7 @@ export default function Students() {
                   <Stack gap="$4" flex={1} flexGrow={1} flexShrink={1}>
                     <XStack ai={'center'} jc={'space-between'}>
                       <Button
+                        w={94}
                         onPress={() => {
                           setSearchQuery('');
                           setGenderFilter([]);
@@ -265,7 +266,11 @@ export default function Students() {
                       <H4 flex={1} textAlign="center">
                         Lọc
                       </H4>
-                      <Button onPress={onApplyFilter} theme="yellow_alt2">
+                      <Button
+                        w={94}
+                        onPress={onApplyFilter}
+                        theme="yellow_alt2"
+                      >
                         Áp dụng
                       </Button>
                     </XStack>
