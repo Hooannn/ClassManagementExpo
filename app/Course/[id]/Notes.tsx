@@ -1,4 +1,5 @@
 import {
+  Alert,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -16,8 +17,7 @@ import {
   Sheet,
   Input,
   H4,
-  ListItem,
-  YGroup,
+  Label,
 } from 'tamagui';
 import ProtectedScreen from '../../../components/shared/ProtectedScreen';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -34,6 +34,8 @@ import { CourseNote, Response } from '../../../interfaces';
 import { useAxiosIns, useToast } from '../../../hooks';
 import NoteEditor from '../../../components/NoteEditor';
 import NoteCard from '../../../components/NoteCard';
+import UniversalDatePicker from '../../../components/UniversalDatePicker';
+import dayjs from '../../../libs/dayjs';
 
 export default function Notes() {
   const { id } = useLocalSearchParams();
@@ -46,6 +48,9 @@ export default function Notes() {
     useState(false);
   const [shouldOpenFilter, setShouldOpenFilter] = useState(false);
   const [isFiltering, setIsFiltering] = useState(false);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [filterDateFrom, setFilterDateFrom] = useState<Date | null>(null);
+  const [filterDateTo, setFilterDateTo] = useState<Date | null>(null);
 
   const getCourseNotesQuery = useQuery({
     queryKey: ['fetch/courseId/notes', id.toString()],
@@ -59,9 +64,55 @@ export default function Notes() {
 
   const notes = getCourseNotesQuery.data?.data?.data || [];
 
-  const filterNotes = () => {
-    return notes;
+  const onApplyFilter = () => {
+    setShouldOpenFilter(false);
+    if (
+      searchQuery.trim() !== '' ||
+      filterDateFrom !== null ||
+      filterDateTo !== null
+    ) {
+      setIsFiltering(true);
+    } else {
+      setIsFiltering(false);
+    }
   };
+
+  const filterNotes = () => {
+    if (!isFiltering) return notes;
+    const results: CourseNote[] = [];
+
+    notes.forEach((note) => {
+      let firstCondition = false;
+      let secondCondition = false;
+      let thirdCondition = false;
+
+      if (searchQuery.trim() !== '') {
+        firstCondition =
+          note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          note.content.toLowerCase().includes(searchQuery.toLowerCase());
+      } else if (searchQuery.trim() === '') {
+        firstCondition = true;
+      }
+
+      if (filterDateFrom !== null) {
+        secondCondition = dayjs(note.updated_at).isAfter(filterDateFrom);
+      } else if (filterDateFrom === null) {
+        secondCondition = true;
+      }
+
+      if (filterDateTo !== null) {
+        thirdCondition = dayjs(note.updated_at).isBefore(filterDateTo);
+      } else if (filterDateTo === null) {
+        thirdCondition = true;
+      }
+
+      if (firstCondition && secondCondition && thirdCondition) {
+        results.push(note);
+      }
+    });
+    return results;
+  };
+
   return (
     <ProtectedScreen>
       {getCourseNotesQuery.isLoading ? (
@@ -238,7 +289,11 @@ export default function Notes() {
                   <Stack gap="$4" flex={1} flexGrow={1} flexShrink={1}>
                     <XStack ai={'center'} jc={'space-between'}>
                       <Button
-                        onPress={() => {}}
+                        onPress={() => {
+                          setFilterDateFrom(null);
+                          setFilterDateTo(null);
+                          setSearchQuery('');
+                        }}
                         backgroundColor={'$backgroundTransparent'}
                       >
                         Đặt lại
@@ -246,12 +301,7 @@ export default function Notes() {
                       <H4 flex={1} textAlign="center">
                         Lọc
                       </H4>
-                      <Button
-                        onPress={() => {
-                          setShouldOpenFilter(false);
-                        }}
-                        theme="yellow_alt2"
-                      >
+                      <Button onPress={onApplyFilter} theme="yellow_alt2">
                         Áp dụng
                       </Button>
                     </XStack>
@@ -260,11 +310,95 @@ export default function Notes() {
                         <XStack ai="center" gap="$3">
                           <Input
                             flex={1}
-                            placeholder="Tìm theo tên hoặc mô tả..."
+                            placeholder="Tìm theo tiêu đề hoặc nội dung..."
+                            value={searchQuery}
+                            onChangeText={setSearchQuery}
                           />
                           <Search size={24} color={'$gray10'} />
                         </XStack>
-                        <YStack></YStack>
+                        <YStack>
+                          <Text color={'$gray11'}>Cập nhật lần cuối</Text>
+                          <XStack gap="$2">
+                            <XStack
+                              flex={1}
+                              alignItems="center"
+                              jc="center"
+                              gap="$4"
+                            >
+                              <Label>Từ</Label>
+                              <UniversalDatePicker
+                                value={filterDateFrom}
+                                onChange={(date) => {
+                                  const updatedDate = dayjs(date)
+                                    .set('hour', 0)
+                                    .set('minute', 0)
+                                    .set('second', 0)
+                                    .toDate();
+
+                                  if (filterDateTo === null) {
+                                    setFilterDateFrom(updatedDate);
+                                  } else {
+                                    if (dayjs(date).isBefore(filterDateTo)) {
+                                      setFilterDateFrom(updatedDate);
+                                    } else {
+                                      Alert.alert(
+                                        'Thông báo',
+                                        'Ngày bắt đầu phải trước ngày kết thúc',
+                                        [
+                                          {
+                                            text: 'Đóng',
+                                            onPress: () => {},
+                                            style: 'cancel',
+                                          },
+                                        ],
+                                        { cancelable: true },
+                                      );
+                                    }
+                                  }
+                                }}
+                              />
+                            </XStack>
+                            <XStack
+                              flex={1}
+                              alignItems="center"
+                              jc="center"
+                              gap="$4"
+                            >
+                              <Label>đến</Label>
+                              <UniversalDatePicker
+                                value={filterDateTo}
+                                onChange={(date) => {
+                                  const updatedDate = dayjs(date)
+                                    .set('hour', 23)
+                                    .set('minute', 59)
+                                    .set('second', 59)
+                                    .toDate();
+
+                                  if (filterDateFrom === null) {
+                                    setFilterDateTo(updatedDate);
+                                  } else {
+                                    if (dayjs(date).isAfter(filterDateFrom)) {
+                                      setFilterDateTo(updatedDate);
+                                    } else {
+                                      Alert.alert(
+                                        'Thông báo',
+                                        'Ngày kết thúc phải sau ngày bắt đầu',
+                                        [
+                                          {
+                                            text: 'Đóng',
+                                            onPress: () => {},
+                                            style: 'cancel',
+                                          },
+                                        ],
+                                        { cancelable: true },
+                                      );
+                                    }
+                                  }
+                                }}
+                              />
+                            </XStack>
+                          </XStack>
+                        </YStack>
                       </Stack>
                     </ScrollView>
                   </Stack>

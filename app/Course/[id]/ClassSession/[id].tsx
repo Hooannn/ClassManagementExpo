@@ -40,8 +40,12 @@ import { useState } from 'react';
 import AttendanceCamera from '../../../../components/AttendanceCamera';
 import { useAxiosIns, useToast } from '../../../../hooks';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { Modal } from 'react-native';
+import { Alert, Modal, Platform } from 'react-native';
 import TakeAttendanceResults from '../../../../components/TakeAttendanceResults';
+import * as FileSystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
+import * as Print from 'expo-print';
+import * as XLSX from 'xlsx';
 
 export default function ClassSession() {
   const axios = useAxiosIns();
@@ -175,6 +179,119 @@ export default function ClassSession() {
     } else {
       takeAttendanceByManualMutation.mutate(studentId);
     }
+  };
+
+  const [isExporting, setIsExporting] = useState(false);
+
+  const exportReport = async () => {
+    setIsExporting(true);
+    try {
+      const title = `Buổi ${parseInt(idx.toString()) + 1} - ${capitalize(
+        dayjs(session?.start_time).format('dddd DD/MM/YYYY'),
+      )}`;
+      const subtitle = `Từ ${dayjs(session?.start_time).format(
+        'HH:mm',
+      )} đến ${dayjs(session?.end_time).format('HH:mm')}`;
+      const tableRows = course.enrollments
+        .map(
+          (enrollment, idx) => `
+      <tr>
+        <td>${idx + 1}</td>
+        <td>${enrollment.student_id}</td>
+        <td>${enrollment.student.last_name} ${
+            enrollment.student.first_name
+          } </td>
+        <td>${isPresent(enrollment.student_id) ? 'Có' : 'Không'}</td>
+      </tr>
+    `,
+        )
+        .join('');
+
+      const html = `
+      <html>
+        <head>
+          <style>
+            body { font-family: Arial, sans-serif; }
+            h1 { color: #333; }
+            h2 { color: #666; }
+            table { width: 100%; border-collapse: collapse; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            th { background-color: #f2f2f2; }
+          </style>
+        </head>
+        <body>
+          <h1>${title}</h1>
+          <h2>${subtitle}</h2>
+          <table>
+            <tr>
+              <th>STT</th>
+              <th>MSSV</th>
+              <th>Họ tên</th>
+              <th>Đi học</th>
+            </tr>
+            ${tableRows}
+          </table>
+        </body>
+      </html>
+    `;
+
+      const { uri } = await Print.printToFileAsync({ html });
+
+      if (Platform.OS === 'android') {
+        const permissions =
+          await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+        if (permissions.granted) {
+          const base64 = await FileSystem.readAsStringAsync(uri, {
+            encoding: FileSystem.EncodingType.Base64,
+          });
+          await FileSystem.StorageAccessFramework.createFileAsync(
+            permissions.directoryUri,
+            'export.pdf',
+            'application/pdf',
+          )
+            .then(async (createdUri) => {
+              await FileSystem.writeAsStringAsync(createdUri, base64, {
+                encoding: FileSystem.EncodingType.Base64,
+              });
+            })
+            .catch((error) => {
+              toast.show('Thất bại', {
+                message: error.message || 'Có lỗi khi xuất báo cáo',
+                native: false,
+                customData: {
+                  theme: 'red',
+                },
+              });
+            });
+        } else {
+          toast.show('Không có quyền truy cập vào bộ nhớ', {
+            native: false,
+            customData: {
+              theme: 'red',
+            },
+          });
+        }
+      } else {
+        await Sharing.shareAsync(uri, {
+          dialogTitle: 'Xuất báo cáo',
+        });
+      }
+      toast.show('Xuất báo cáo thành công', {
+        native: false,
+        customData: {
+          theme: 'green',
+        },
+      });
+    } catch (error: any) {
+      toast.show('Thất bại', {
+        message: error?.message || 'Có lỗi khi xuất báo cáo',
+        native: false,
+        customData: {
+          theme: 'red',
+        },
+      });
+    }
+    setIsExporting(false);
   };
   return (
     <>
@@ -501,6 +618,7 @@ export default function ClassSession() {
                 </XStack>
                 <XStack
                   px="$6"
+                  onPress={exportReport}
                   pressStyle={{
                     backgroundColor: '$gray5',
                   }}

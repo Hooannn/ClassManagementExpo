@@ -13,8 +13,6 @@ import {
   ScrollView,
   Sheet,
   H4,
-  H6,
-  H5,
 } from 'tamagui';
 import ProtectedScreen from '../../../components/shared/ProtectedScreen';
 import {
@@ -94,13 +92,20 @@ export default function CourseDetailScreen() {
           </Stack>
         </SafeAreaView>
       ) : (
-        <SafeAreaView style={{ flex: 1, paddingBottom: -insets.bottom }}>
+        <SafeAreaView
+          style={{
+            flex: 1,
+            paddingBottom: -insets.bottom,
+            backgroundColor: '#e4e2d4',
+          }}
+        >
           <YStack gap="$1" flex={1}>
             <XStack px="$5" ai={'center'} jc="space-between">
               <XStack gap="$2" ai={'center'}>
                 <Button
                   circular
                   color={'$yellow11'}
+                  variant="outlined"
                   onPress={() => router.back()}
                   icon={<ChevronLeft size={22} />}
                   size="$4"
@@ -110,6 +115,7 @@ export default function CourseDetailScreen() {
               <Button
                 onPress={() => setShouldSettingOpen(true)}
                 circular
+                variant="outlined"
                 color={'$yellow11'}
                 icon={<MoreVertical size={20} />}
                 size="$4"

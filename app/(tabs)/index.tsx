@@ -12,14 +12,19 @@ import {
   Separator,
   ScrollView,
   H4,
-  H3,
+  Stack,
+  H5,
+  H6,
 } from 'tamagui';
 import dayjs from '../../libs/dayjs';
 import ProtectedScreen from '../../components/shared/ProtectedScreen';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 import useProfileStore from '../../stores/profile';
 import { CONSTANTS } from '../../constants';
-import { ChevronRight, Menu, Book } from '@tamagui/lucide-icons';
+import { ChevronRight, Book, Settings2 } from '@tamagui/lucide-icons';
 import { useQuery } from '@tanstack/react-query';
 import { useAxiosIns } from '../../hooks';
 import { useAssets } from 'expo-asset';
@@ -46,40 +51,68 @@ export default function HomeScreen() {
   });
 
   const myCourses = getMyCoursesQuery.data?.data?.data || [];
-
+  const insets = useSafeAreaInsets();
   return (
     <ProtectedScreen>
-      <SafeAreaView style={{ flex: 1 }}>
-        <ScrollView>
-          <YStack px="$5" gap="$1">
-            <XStack ai={'center'} jc="space-between" py="$3">
-              <XStack ai={'center'} gap="$2">
-                <Button circular icon={<Menu size={24} />} size="$5"></Button>
-              </XStack>
-              <XStack ai={'center'} gap="$2">
-                <Avatar circular size="$5">
-                  <Avatar.Image
-                    accessibilityLabel="Cam"
-                    source={{
-                      uri: user?.profile_picture
-                        ? `${CONSTANTS.BACKEND_URL}${user.profile_picture}`
-                        : assets?.[1].uri,
-                      cache: 'force-cache',
-                    }}
-                  />
-                  <Avatar.Fallback
-                    backgroundColor={'$gray10Light'}
-                  ></Avatar.Fallback>
-                </Avatar>
-              </XStack>
+      <SafeAreaView
+        style={{
+          flex: 1,
+          backgroundColor: '#e4e2d4',
+          paddingBottom: -insets.bottom,
+        }}
+      >
+        <YStack flex={1}>
+          <XStack px="$5" ai={'center'} jc="space-between" pt="$3" pb="$5">
+            <XStack ai={'center'} gap="$2">
+              <Avatar circular size="$5">
+                <Avatar.Image
+                  accessibilityLabel="Cam"
+                  source={{
+                    uri: user?.profile_picture
+                      ? `${CONSTANTS.BACKEND_URL}${user.profile_picture}`
+                      : assets?.[1].uri,
+                    cache: 'force-cache',
+                  }}
+                />
+                <Avatar.Fallback
+                  backgroundColor={'$gray10Light'}
+                ></Avatar.Fallback>
+              </Avatar>
+              <YStack gap="$1">
+                <Text color={'$gray12'}>Xin chào,</Text>
+                <H4 lineHeight="$4" color={'$gray12'}>
+                  {name}
+                </H4>
+              </YStack>
             </XStack>
-            <YStack gap="$5">
-              <XStack ai={'center'}>
-                <H3>Xin chào, {name}</H3>
-              </XStack>
-              <YStack gap="$2">
+            <XStack ai={'center'} gap="$2">
+              <Button
+                circular
+                variant="outlined"
+                borderWidth={0}
+                onPress={() => {
+                  router.push('/Settings');
+                }}
+                icon={<Settings2 size={24} color={'$gray11'} />}
+                size="$5"
+              ></Button>
+            </XStack>
+          </XStack>
+          <Stack
+            flex={1}
+            backgroundColor={'white'}
+            shadowOffset={{ width: 0, height: 2 }}
+            shadowOpacity={0.1}
+            shadowRadius={4}
+            overflow="hidden"
+            shadowColor={'black'}
+            borderTopEndRadius={'$6'}
+            borderTopStartRadius={'$6'}
+          >
+            <ScrollView flex={1}>
+              <YStack px="$5" py="$4" gap="$2">
                 <XStack ai={'center'}>
-                  <Text fontWeight="500" fontSize="$4" color={'$gray12'}>
+                  <Text fontSize="$4" color={'$gray12'}>
                     Lớp học của bạn
                   </Text>
                 </XStack>
@@ -147,9 +180,9 @@ export default function HomeScreen() {
                   </>
                 )}
               </YStack>
-            </YStack>
-          </YStack>
-        </ScrollView>
+            </ScrollView>
+          </Stack>
+        </YStack>
       </SafeAreaView>
     </ProtectedScreen>
   );

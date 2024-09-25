@@ -30,7 +30,7 @@ export default function NoteEditor({
   const [noteTitle, setNoteTitle] = useState('');
 
   const editor = useEditorBridge({
-    autofocus: false,
+    autofocus: !isAddingNewNote,
     avoidIosKeyboard: true,
     initialContent: isAddingNewNote ? undefined : defaultNoteContent,
     theme: {
@@ -140,11 +140,11 @@ export default function NoteEditor({
               theme={'yellow_alt2'}
               variant="outlined"
             >
-              {isLoading ? <Spinner /> : 'Huỷ'}
+              Huỷ
             </Button>
             <Stack flex={1} ac="center" jc={'center'}>
               <Input
-                autoFocus
+                autoFocus={isAddingNewNote}
                 returnKeyType="next"
                 value={noteTitle}
                 onChangeText={setNoteTitle}
