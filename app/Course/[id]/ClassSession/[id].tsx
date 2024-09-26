@@ -40,11 +40,10 @@ import { useState } from 'react';
 import AttendanceCamera from '../../../../components/AttendanceCamera';
 import { useAxiosIns, useToast } from '../../../../hooks';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { Alert, Modal, Platform } from 'react-native';
+import { Modal, Platform } from 'react-native';
 import TakeAttendanceResults from '../../../../components/TakeAttendanceResults';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
-import * as Print from 'expo-print';
 import * as XLSX from 'xlsx';
 
 export default function ClassSession() {
@@ -186,83 +185,58 @@ export default function ClassSession() {
   const exportReport = async () => {
     setIsExporting(true);
     try {
+      const courseName = `Lớp: ${course.subject.name} - ${course.subject_id}. Năm học ${course.year - 1}-${course.year} - Học kỳ ${course.semester
+        }`;
       const title = `Buổi ${parseInt(idx.toString()) + 1} - ${capitalize(
         dayjs(session?.start_time).format('dddd DD/MM/YYYY'),
       )}`;
       const subtitle = `Từ ${dayjs(session?.start_time).format(
         'HH:mm',
       )} đến ${dayjs(session?.end_time).format('HH:mm')}`;
-      const tableRows = course.enrollments
-        .map(
-          (enrollment, idx) => `
-      <tr>
-        <td>${idx + 1}</td>
-        <td>${enrollment.student_id}</td>
-        <td>${enrollment.student.last_name} ${
-            enrollment.student.first_name
-          } </td>
-        <td>${isPresent(enrollment.student_id) ? 'Có' : 'Không'}</td>
-      </tr>
-    `,
-        )
-        .join('');
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.aoa_to_sheet([
+        [courseName],
+        [title],
+        [subtitle],
+        [],
+        ['STT', 'MSSV', 'Họ tên', 'Đi học']
+      ]);
 
-      const html = `
-      <html>
-        <head>
-          <style>
-            body { font-family: Arial, sans-serif; }
-            h1 { color: #333; }
-            h2 { color: #666; }
-            table { width: 100%; border-collapse: collapse; }
-            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-            th { background-color: #f2f2f2; }
-          </style>
-        </head>
-        <body>
-          <h1>${title}</h1>
-          <h2>${subtitle}</h2>
-          <table>
-            <tr>
-              <th>STT</th>
-              <th>MSSV</th>
-              <th>Họ tên</th>
-              <th>Đi học</th>
-            </tr>
-            ${tableRows}
-          </table>
-        </body>
-      </html>
-    `;
+      course.enrollments.forEach((enrollment, index) => {
+        XLSX.utils.sheet_add_aoa(ws, [[
+          index + 1,
+          enrollment.student_id,
+          `${enrollment.student.last_name} ${enrollment.student.first_name}`,
+          isPresent(enrollment.student_id) ? 'Có' : 'Không'
+        ]], { origin: -1 });
+      });
 
-      const { uri } = await Print.printToFileAsync({ html });
+      const colWidths = [{ wch: 5 }, { wch: 20 }, { wch: 30 }, { wch: 10 }];
+      ws['!cols'] = colWidths;
+
+      XLSX.utils.book_append_sheet(wb, ws, "Attendance");
+
+      const wbout = XLSX.write(wb, { type: 'base64', bookType: 'xlsx' });
+
+      const fileName = `Buoi_${parseInt(idx.toString()) + 1}_${dayjs(session?.start_time).format('YYYY-MM-DD')}.xlsx`;
+      const fileUri = FileSystem.documentDirectory + fileName;
+
+      await FileSystem.writeAsStringAsync(fileUri, wbout, {
+        encoding: FileSystem.EncodingType.Base64
+      });
 
       if (Platform.OS === 'android') {
-        const permissions =
-          await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+        const permissions = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
         if (permissions.granted) {
-          const base64 = await FileSystem.readAsStringAsync(uri, {
-            encoding: FileSystem.EncodingType.Base64,
-          });
-          await FileSystem.StorageAccessFramework.createFileAsync(
+          const destinationUri = await FileSystem.StorageAccessFramework.createFileAsync(
             permissions.directoryUri,
-            'export.pdf',
-            'application/pdf',
-          )
-            .then(async (createdUri) => {
-              await FileSystem.writeAsStringAsync(createdUri, base64, {
-                encoding: FileSystem.EncodingType.Base64,
-              });
-            })
-            .catch((error) => {
-              toast.show('Thất bại', {
-                message: error.message || 'Có lỗi khi xuất báo cáo',
-                native: false,
-                customData: {
-                  theme: 'red',
-                },
-              });
-            });
+            fileName,
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+          );
+          await FileSystem.copyAsync({
+            from: fileUri,
+            to: destinationUri
+          });
         } else {
           toast.show('Không có quyền truy cập vào bộ nhớ', {
             native: false,
@@ -272,10 +246,9 @@ export default function ClassSession() {
           });
         }
       } else {
-        await Sharing.shareAsync(uri, {
-          dialogTitle: 'Xuất báo cáo',
-        });
+        await Sharing.shareAsync(fileUri);
       }
+
       toast.show('Xuất báo cáo thành công', {
         native: false,
         customData: {
@@ -292,9 +265,17 @@ export default function ClassSession() {
       });
     }
     setIsExporting(false);
-  };
+    setShouldSettingOpen(false);
+  }
   return (
     <>
+      {
+        isExporting && <ZStack zIndex={999999} animation={'100ms'} fullscreen backgroundColor={'rgba(0,0,0,0.3)'}>
+          <Stack alignItems="center" justifyContent="center" flex={1}>
+            <Spinner size='large' color={'$yellow11'} />
+          </Stack>
+        </ZStack>
+      }
       {takeAttendancesByPictureMutation.isLoading ? (
         <ZStack animation={'100ms'} fullscreen>
           <Stack alignItems="center" justifyContent="center" flex={1}>
@@ -313,17 +294,17 @@ export default function ClassSession() {
         <ProtectedScreen>
           {(takeAttendanceByManualMutation.isLoading ||
             deleteAttandanceRecordMutation.isLoading) && (
-            <ZStack
-              animation={'100ms'}
-              fullscreen
-              backgroundColor="rgba(0, 0, 0, 0.4)"
-              zIndex={99}
-            >
-              <Stack alignItems="center" justifyContent="center" flex={1}>
-                <Spinner size="large" color={'$yellow11'} />
-              </Stack>
-            </ZStack>
-          )}
+              <ZStack
+                animation={'100ms'}
+                fullscreen
+                backgroundColor="rgba(0, 0, 0, 0.4)"
+                zIndex={99}
+              >
+                <Stack alignItems="center" justifyContent="center" flex={1}>
+                  <Spinner size="large" color={'$yellow11'} />
+                </Stack>
+              </ZStack>
+            )}
           <SafeAreaView style={{ flex: 1 }}>
             <Modal
               animationType="slide"
@@ -399,11 +380,10 @@ export default function ClassSession() {
                     size="$4"
                   ></Button>
                   <YStack gap="$1">
-                    <Text fontSize={'$5'}>{`Buổi ${
-                      parseInt(idx.toString()) + 1
-                    } - ${capitalize(
-                      dayjs(session?.start_time).format('dddd DD/MM/YYYY'),
-                    )}`}</Text>
+                    <Text fontSize={'$5'}>{`Buổi ${parseInt(idx.toString()) + 1
+                      } - ${capitalize(
+                        dayjs(session?.start_time).format('dddd DD/MM/YYYY'),
+                      )}`}</Text>
                     <Text color="$gray11">{`Từ ${dayjs(
                       session?.start_time,
                     ).format('HH:mm')} đến ${dayjs(session?.end_time).format(
