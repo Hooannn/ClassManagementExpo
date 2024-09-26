@@ -185,8 +185,9 @@ export default function ClassSession() {
   const exportReport = async () => {
     setIsExporting(true);
     try {
-      const courseName = `Lớp: ${course.subject.name} - ${course.subject_id}. Năm học ${course.year - 1}-${course.year} - Học kỳ ${course.semester
-        }`;
+      const courseName = `Lớp: ${course.subject.name} - ${
+        course.subject_id
+      }. Năm học ${course.year - 1}-${course.year} - Học kỳ ${course.semester}`;
       const title = `Buổi ${parseInt(idx.toString()) + 1} - ${capitalize(
         dayjs(session?.start_time).format('dddd DD/MM/YYYY'),
       )}`;
@@ -199,43 +200,48 @@ export default function ClassSession() {
         [title],
         [subtitle],
         [],
-        ['STT', 'MSSV', 'Họ tên', 'Đi học']
+        ['STT', 'MSSV', 'Họ tên', 'Đi học'],
       ]);
 
       course.enrollments.forEach((enrollment, index) => {
-        XLSX.utils.sheet_add_aoa(ws, [[
-          index + 1,
-          enrollment.student_id,
-          `${enrollment.student.last_name} ${enrollment.student.first_name}`,
-          isPresent(enrollment.student_id) ? 'Có' : 'Không'
-        ]], { origin: -1 });
+        XLSX.utils.sheet_add_aoa(
+          ws,
+          [
+            [
+              index + 1,
+              enrollment.student_id,
+              `${enrollment.student.last_name} ${enrollment.student.first_name}`,
+              isPresent(enrollment.student_id) ? 'Có' : 'Không',
+            ],
+          ],
+          { origin: -1 },
+        );
       });
 
       const colWidths = [{ wch: 5 }, { wch: 20 }, { wch: 30 }, { wch: 10 }];
       ws['!cols'] = colWidths;
 
-      XLSX.utils.book_append_sheet(wb, ws, "Attendance");
+      XLSX.utils.book_append_sheet(wb, ws, 'Attendance');
 
       const wbout = XLSX.write(wb, { type: 'base64', bookType: 'xlsx' });
 
-      const fileName = `Buoi_${parseInt(idx.toString()) + 1}_${dayjs(session?.start_time).format('YYYY-MM-DD')}.xlsx`;
-      const fileUri = FileSystem.documentDirectory + fileName;
-
-      await FileSystem.writeAsStringAsync(fileUri, wbout, {
-        encoding: FileSystem.EncodingType.Base64
-      });
+      const fileName = `Buoi_${parseInt(idx.toString()) + 1}_${dayjs(
+        session?.start_time,
+      ).format('YYYY-MM-DD')}.xlsx`;
 
       if (Platform.OS === 'android') {
-        const permissions = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+        const permissions =
+          await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
         if (permissions.granted) {
-          const destinationUri = await FileSystem.StorageAccessFramework.createFileAsync(
-            permissions.directoryUri,
-            fileName,
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-          );
-          await FileSystem.copyAsync({
-            from: fileUri,
-            to: destinationUri
+          const destinationUri =
+            await FileSystem.StorageAccessFramework.createFileAsync(
+              permissions.directoryUri,
+              fileName,
+              'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            );
+
+          await FileSystem.writeAsStringAsync(destinationUri, wbout, {
+            encoding: FileSystem.EncodingType.Base64,
           });
         } else {
           toast.show('Không có quyền truy cập vào bộ nhớ', {
@@ -246,6 +252,10 @@ export default function ClassSession() {
           });
         }
       } else {
+        const fileUri = FileSystem.documentDirectory + fileName;
+        await FileSystem.writeAsStringAsync(fileUri, wbout, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
         await Sharing.shareAsync(fileUri);
       }
 
@@ -266,16 +276,21 @@ export default function ClassSession() {
     }
     setIsExporting(false);
     setShouldSettingOpen(false);
-  }
+  };
   return (
     <>
-      {
-        isExporting && <ZStack zIndex={999999} animation={'100ms'} fullscreen backgroundColor={'rgba(0,0,0,0.3)'}>
+      {isExporting && (
+        <ZStack
+          zIndex={999999}
+          animation={'100ms'}
+          fullscreen
+          backgroundColor={'rgba(0,0,0,0.3)'}
+        >
           <Stack alignItems="center" justifyContent="center" flex={1}>
-            <Spinner size='large' color={'$yellow11'} />
+            <Spinner size="large" color={'$yellow11'} />
           </Stack>
         </ZStack>
-      }
+      )}
       {takeAttendancesByPictureMutation.isLoading ? (
         <ZStack animation={'100ms'} fullscreen>
           <Stack alignItems="center" justifyContent="center" flex={1}>
@@ -294,17 +309,17 @@ export default function ClassSession() {
         <ProtectedScreen>
           {(takeAttendanceByManualMutation.isLoading ||
             deleteAttandanceRecordMutation.isLoading) && (
-              <ZStack
-                animation={'100ms'}
-                fullscreen
-                backgroundColor="rgba(0, 0, 0, 0.4)"
-                zIndex={99}
-              >
-                <Stack alignItems="center" justifyContent="center" flex={1}>
-                  <Spinner size="large" color={'$yellow11'} />
-                </Stack>
-              </ZStack>
-            )}
+            <ZStack
+              animation={'100ms'}
+              fullscreen
+              backgroundColor="rgba(0, 0, 0, 0.4)"
+              zIndex={99}
+            >
+              <Stack alignItems="center" justifyContent="center" flex={1}>
+                <Spinner size="large" color={'$yellow11'} />
+              </Stack>
+            </ZStack>
+          )}
           <SafeAreaView style={{ flex: 1 }}>
             <Modal
               animationType="slide"
@@ -380,10 +395,11 @@ export default function ClassSession() {
                     size="$4"
                   ></Button>
                   <YStack gap="$1">
-                    <Text fontSize={'$5'}>{`Buổi ${parseInt(idx.toString()) + 1
-                      } - ${capitalize(
-                        dayjs(session?.start_time).format('dddd DD/MM/YYYY'),
-                      )}`}</Text>
+                    <Text fontSize={'$5'}>{`Buổi ${
+                      parseInt(idx.toString()) + 1
+                    } - ${capitalize(
+                      dayjs(session?.start_time).format('dddd DD/MM/YYYY'),
+                    )}`}</Text>
                     <Text color="$gray11">{`Từ ${dayjs(
                       session?.start_time,
                     ).format('HH:mm')} đến ${dayjs(session?.end_time).format(
