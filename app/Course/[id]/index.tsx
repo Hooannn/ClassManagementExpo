@@ -179,7 +179,7 @@ export default function CourseDetailScreen() {
       ];
       ws['!cols'] = colWidths;
 
-      XLSX.utils.book_append_sheet(wb, ws, 'Attendance');
+      XLSX.utils.book_append_sheet(wb, ws, 'Grade');
 
       const wbout = XLSX.write(wb, { type: 'base64', bookType: 'xlsx' });
 
