@@ -1,5 +1,6 @@
 {
   "expo": {
+    "newArchEnabled": false,
     "name": "class-management-expo",
     "slug": "class-management-expo",
     "version": "1.0.0",
@@ -12,7 +13,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.classmanagement.app",
@@ -22,7 +25,9 @@
         "NSCameraUsageDescription": "This app uses the camera to scan QR codes",
         "NSPhotoLibraryUsageDescription": "This app uses the photo library to scan QR codes",
         "NSMicrophoneUsageDescription": "This app uses the microphone to record audio",
-        "UIBackgroundModes": ["audio"]
+        "UIBackgroundModes": [
+          "audio"
+        ]
       }
     },
     "android": {
@@ -67,7 +72,8 @@
         {
           "photosPermission": "Cho phép $(PRODUCT_NAME) truy cập vào thư viện ảnh"
         }
-      ]
+      ],
+      "expo-router"
     ]
   }
 }

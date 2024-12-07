@@ -8,6 +8,7 @@ import { useAssets } from 'expo-asset';
 import { useToastController } from '@tamagui/toast';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { TextInput } from 'react-native';
+import { validatePassword } from '../../utils/validatePassword';
 
 export default function SignIn() {
   const [assets] = useAssets([require('../../assets/images/Login2.png')]);
@@ -23,6 +24,15 @@ export default function SignIn() {
   const onSubmit = async () => {
     if (email.trim() === '' || password.trim() === '') {
       toast?.show('Hãy nhập đủ thông tin đăng nhập', {
+        native: false,
+        customData: {
+          theme: 'yellow',
+        },
+      });
+      return;
+    }
+    if (validatePassword(password) === false) {
+      toast?.show('Mật khẩu phải chứa ít nhất 6 ký tự', {
         native: false,
         customData: {
           theme: 'yellow',

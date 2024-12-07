@@ -26,6 +26,7 @@ import { useAxiosIns, useToast } from '../../hooks';
 import dayjs from '../../libs/dayjs';
 import { useMutation } from '@tanstack/react-query';
 import { Response, User } from '../../interfaces';
+import { validatePassword } from '../../utils/validatePassword';
 
 export default function ChangePassword() {
   const { toast, toastOnError } = useToast();
@@ -78,6 +79,16 @@ export default function ChangePassword() {
 
     if (newPassword !== confirmPassword) {
       toast?.show('Mật khẩu không khớp', {
+        native: false,
+        customData: {
+          theme: 'yellow',
+        },
+      });
+      return;
+    }
+
+    if (validatePassword(newPassword) === false) {
+      toast?.show('Mật khẩu phải chứa ít nhất 6 ký tự', {
         native: false,
         customData: {
           theme: 'yellow',

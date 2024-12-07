@@ -122,7 +122,6 @@ export default function NoteEditor({
   return (
     <Modal
       animationType="slide"
-      transparent={false}
       presentationStyle="fullScreen"
       onDismiss={() => setIsOpen(false)}
       visible={isOpen}

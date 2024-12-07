@@ -36,7 +36,7 @@ import ProtectedScreen from '../../../../components/shared/ProtectedScreen';
 import { CONSTANTS } from '../../../../constants';
 import { capitalize } from '../../../../utils/stringFormat';
 import dayjs from '../../../../libs/dayjs';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import AttendanceCamera from '../../../../components/AttendanceCamera';
 import { useAxiosIns, useToast } from '../../../../hooks';
 import { useMutation, useQuery } from '@tanstack/react-query';
@@ -346,7 +346,6 @@ export default function ClassSession() {
             </Modal>
             <Modal
               animationType="slide"
-              transparent={true}
               presentationStyle="fullScreen"
               onDismiss={() => setIsTakingAttendance(false)}
               visible={isTakingAttendance}
@@ -607,7 +606,9 @@ export default function ClassSession() {
                     borderColor={
                       acceptTakeManualAttendance ? '$green7' : '$gray5'
                     }
-                    onCheckedChange={setAcceptTakeManualAttendance}
+                    onCheckedChange={(checked) => {
+                      setAcceptTakeManualAttendance(checked);
+                    }}
                   >
                     <Switch.Thumb backgroundColor={'white'} animation="quick" />
                   </Switch>
