@@ -152,7 +152,7 @@ export default function ClassSession() {
     );
   };
 
-  const onAttandanceCheckboxPress = (studentId: string) => () => {
+  const onAttandanceCheckboxPress = (studentId: string) => {
     if (!acceptTakeManualAttendance) {
       toast?.show('Hãy bật điểm danh bằng tay để tiếp tục', {
         native: false,
@@ -162,12 +162,7 @@ export default function ClassSession() {
       });
       return;
     }
-    const isPresent = attendanceRecords.some(
-      (record) =>
-        record.student_id === studentId &&
-        record.status === AttendanceStatus.PRESENT,
-    );
-    if (isPresent) {
+    if (isPresent(studentId)) {
       const record = attendanceRecords.find(
         (record) =>
           record.student_id === studentId &&
@@ -525,7 +520,12 @@ export default function ClassSession() {
                           </XStack>
                           {course.enrollments.map((enrollment, rowIndex) => (
                             <XStack
-                              key={rowIndex}
+                              key={
+                                rowIndex +
+                                enrollment.student_id +
+                                isPresent(enrollment.student_id) +
+                                acceptTakeManualAttendance
+                              }
                               padding="$2"
                               justifyContent="space-between"
                               ai={'center'}
@@ -542,9 +542,11 @@ export default function ClassSession() {
                               </YStack>
                               <YStack flex={1} alignItems="center">
                                 <Checkbox
-                                  onPress={onAttandanceCheckboxPress(
-                                    enrollment.student_id,
-                                  )}
+                                  onPress={() => {
+                                    onAttandanceCheckboxPress(
+                                      enrollment.student_id,
+                                    );
+                                  }}
                                   id={enrollment.student_id}
                                   checked={isPresent(enrollment.student_id)}
                                 >
